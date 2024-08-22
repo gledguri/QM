@@ -190,7 +190,8 @@ mutate_indices <- function(data, index_column) {
 #' ss_param <- ss_param_extract(stanMod = stanMod_1)
 ss_param_extract <- function(stanMod){
 	l <- c('alpha_0','alpha_1','eta_0','eta_1','gamma_0','gamma_1')
-	output <- extract_param(stanMod,l)
+	output <- summary(stanMod, l)$summary
+	# output <- extract_param(stanMod,l)
 	return(output)
 }
 
