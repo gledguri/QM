@@ -19,8 +19,8 @@
 #'
 #' # Extract summary statistics for a different parameter, "beta"
 #' param_summary <- extract_param(model = stanMod_1, parmeter = "beta")
-extract_param <- function(model=stanMod,parmeter){
-	fit <- summary(model, par = parmeter)[[1]]
+extract_param <- function(model=stanMod,par){
+	fit <- summary(model, par = parmeter)$summary
 	return(fit %>% unlist()%>%as.data.frame%>%round(.,2))
 }
 
