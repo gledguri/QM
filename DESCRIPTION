@@ -1,0 +1,12 @@
+Package: QM
+Type: Package
+Title: Quantification of eDNA metabarcoding data
+Version: 1.0.0
+Author: Gledis Guri
+Maintainer: Gledis Guri <gled.guri@gmail.com>
+Description: Joins eDNA metabarcoding and qPCR data for multi-species quantification
+    Use four spaces when indenting paragraphs within the Description.
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.2
