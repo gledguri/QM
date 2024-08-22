@@ -19,9 +19,9 @@
 #'
 #' # Extract summary statistics for a different parameter, "beta"
 #' param_summary <- extract_param(model = stanMod_1, parmeter = "beta")
-extract_param <- function(model=stanMod,parmeter="alpha"){
-	fit <- summary(model, par = parmeter)
-	return(fit$summary %>% unlist()%>%as.data.frame%>%round(.,2))
+extract_param <- function(model=stanMod,parmeter){
+	fit <- summary(model, par = parmeter)[[1]]
+	return(fit %>% unlist()%>%as.data.frame%>%round(.,2))
 }
 
 #' Extract 2-Dimensional Model parameters as a matrix
@@ -187,7 +187,8 @@ mutate_indices <- function(data, index_column) {
 #' # Assuming you have run the model and have a stanfit object called stanMod_1
 #' ss_param <- ss_param_extract(stanMod = stanMod_1)
 ss_param_extract <- function(stanMod){
-	output <- extract_param(stanMod,c("alpha_0","alpha_1","eta_0","eta_1","gamma_0","gamma_1"))
+	l <- c('alpha_0','alpha_1','eta_0','eta_1','gamma_0','gamma_1')
+	output <- extract_param(stanMod,l)
 	return(output)
 }
 
