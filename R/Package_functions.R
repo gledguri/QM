@@ -396,10 +396,10 @@ run_M1 <- function(stan_object=M1,stan_data=stan_data_M1,plot_fig=T){
 		warmup = 2000,
 		data = stan_data
 	)
-	# ss_param <<- ss_param_extract(stanMod = stanMod_1)
-	# if (plot_fig==T) {
-	# plot_ss_param(stan_data=stan_data,ss_param=ss_param,xmin_log,xmax_log)
-	# }
+	ss_param <<- ss_param_extract(stanMod = stanMod_1)
+	if (plot_fig==T) {
+	plot_ss_param(stan_data=stan_data,ss_param=ss_param,xmin_log,xmax_log)
+	}
 }
 #' Plot Probability of Detection
 #'
