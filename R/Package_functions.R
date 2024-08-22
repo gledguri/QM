@@ -1048,7 +1048,8 @@ plot_est_ini_prop <- function(est_ini_prop,stan_data){
 }
 plot_obs_prop <- function(stan_data) {
 	plot1_data <- stan_data$Y_M6 %>% cbind(.,stan_data$Species) %>%
-		column_to_rownames("Species") %>% setNames(stan_data$Station_name_indexed) %>%
+		column_to_rownames("Species") %>% 
+		# setNames(stan_data$Station_name_indexed) %>%
 		rel.ab() %>% trans() %>% setNames(c("Species","Sample","prop"))
 
 	p1 <- ggplot(plot1_data,aes(fill=Species,y=prop,x=Sample))+
