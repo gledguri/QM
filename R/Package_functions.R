@@ -1333,6 +1333,28 @@ mean_by_idx <- function(input,idx){
 	return(as.data.frame(mean))
 }
 
+post_explore_matrix_M4 <- function(stanmod,param){
+	post_explore_data <<- extract_matrix(stanmod,param,'mean') %>% trans() %>% 
+		cbind(.,
+					extract_matrix(stanmod,param,'2.5%') %>% trans() %>% select(Z) %>% rename(q2="Z"),
+					extract_matrix(stanmod,param,'97.5%') %>% trans() %>% select(Z) %>% rename(q98="Z")
+		) %>% mutate(X=as.numeric(X)) %>% 
+		left_join(.,cbind(stan_data_M4$species_idx,stan_data_M4$Species),
+							by=c('X'='species_idx')) %>% 
+		mutate(Y=as.numeric(Y))
+	
+	p <-
+		post_explore_data %>% 
+		ggplot(aes(x=Y,y=Z,colour = Species))+
+		geom_point()+
+		geom_errorbar(aes(ymin = q2,ymax = q98))+
+		scale_color_manual(values = moma.colors("Lupi", n=le(post_explore_data$Species)))+
+		theme_bw()+
+		ylab('Parameter distribution')+
+		xlab('Sample_idx')
+	return(p)
+}
+
 
 # Model's code ------------------------------------------------------------
 
