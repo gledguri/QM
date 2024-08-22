@@ -944,12 +944,12 @@ prep_stan_M4 <- function(data,
 	ini_mock <- data$mock_initial_conc
 	species_idx <- data$species_idx
 	mock_sp_names <- data$Species
-	# if(missing(sample_index)) {
-	# 	st_idx <- c(1:(ncol(otu_data)-1))
-	# 	sample_index <- "missing index"
-	# 	} else {
-	# 		st_idx <- as.integer(as.factor(sample_index))
-	# 		}
+	if(missing(sample_index)) {
+		st_idx <- c(1:(ncol(otu_data)-1))
+		sample_index <- "missing index"
+		} else {
+			st_idx <- as.integer(as.factor(sample_index))
+			}
 	if(missing(sample_index)) {
 		sample_index <- c(1:(ncol(otu_data)-1))
 	} else {
