@@ -225,7 +225,8 @@ est_ss_quant_extract <- function(stanMod){
 	return(output)
 }
 amp_eff_param_extract <- function(stanMod){
-	output <- summary(stanMod,par="alpha")$summary %>% as.data.frame() %>% as.data.frame()
+	output <- methods::selectMethod("summary", signature = "stanfit")(object = stanMod, par = 'alpha')
+	output <- output$summary %>% as.data.frame() %>% as.data.frame()
 	return(output)
 }
 #' Extract amplification efficiencies from Stan Model 3
