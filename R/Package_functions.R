@@ -20,7 +20,8 @@
 #' # Extract summary statistics for a different parameter, "beta"
 #' param_summary <- extract_param(model = stanMod_1, parmeter = "beta")
 extract_param <- function(model,par){
-	fit <- summary(model,par)
+	# fit <- summary(model,par)
+	fit <- methods::selectMethod("summary", signature = "stanfit")(object = model, par = par)
 	# fit <- summary(model, par = par)$summary
 	return(fit)
 	# return(fit %>% unlist()%>%as.data.frame%>%round(.,2))
