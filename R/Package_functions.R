@@ -1,15 +1,15 @@
 #' Extract model parameters
 #'
 #' This function extracts and summarizes parameters from a fitted Stan model.
-#' The function returns a data frame containing the mean, standard error, quantiles, 
+#' The function returns a data frame containing the mean, standard error, quantiles,
 #' number of effective samples, and Rhat value for the specified parameter(s).
-#' 
+#'
 #' @param model A `stanfit` object containing the results of the model fitting
-#' @param parmeter A `character` string specifying the name of the parameter to be extracted 
+#' @param parmeter A `character` string specifying the name of the parameter to be extracted
 #'   from the model. Defaults to `"alpha"`.
 #'
-#' @return A `data.frame` containing the summarized statistics for the specified 
-#'   parameter(s), including mean, standard error, quantiles (2.5%, 25%, 50%, 75%, 97.5%), 
+#' @return A `data.frame` containing the summarized statistics for the specified
+#'   parameter(s), including mean, standard error, quantiles (2.5%, 25%, 50%, 75%, 97.5%),
 #'   effective sample size (n_eff), and Rhat.
 #' @export
 #'
@@ -25,18 +25,18 @@ extract_param <- function(model=stanMod,parmeter="alpha"){
 
 #' Extract 2-Dimensional Model parameters as a matrix
 #'
-#' This function extracts and organizes 2-dimensional parameters (e.g., `alpha[m,n]`) 
-#' from a fitted Stan model into a matrix format. The user can specify which summary statistic 
+#' This function extracts and organizes 2-dimensional parameters (e.g., `alpha[m,n]`)
+#' from a fitted Stan model into a matrix format. The user can specify which summary statistic
 #' (e.g., mean, standard error) to extract.
 #'
 #' @param stanMod A `stanfit` object containing the results of the model fitting.
-#' @param param A `character` string specifying the name of the 2-dimensional parameter to be extracted 
+#' @param param A `character` string specifying the name of the 2-dimensional parameter to be extracted
 #'   from the model (e.g., `"alpha"` for `alpha[m,n]`).
-#' @param vector A `character` string specifying the summary statistic to be extracted for each element 
-#'   of the matrix. Options might include `"mean"`, `"se_mean"`, `"sd"`, or quantiles (e.g., `"2.5%"`). 
+#' @param vector A `character` string specifying the summary statistic to be extracted for each element
+#'   of the matrix. Options might include `"mean"`, `"se_mean"`, `"sd"`, or quantiles (e.g., `"2.5%"`).
 #'   Defaults to `"mean"`.
 #'
-#' @return A `data.frame` representing the 2-dimensional parameter as a matrix, with rows and columns 
+#' @return A `data.frame` representing the 2-dimensional parameter as a matrix, with rows and columns
 #'   corresponding to the indices of the parameter.
 #' @export
 #'
@@ -120,7 +120,7 @@ data_example <- function(data="M1") {
 	}
 	if(data=="M4"){
 		cat(
-			"                        Species    Sample_1    Sample_2    Sample_3 ... Sample_12 
+			"                        Species    Sample_1    Sample_2    Sample_3 ... Sample_12
 1                 Brosme brosme           0           0           0             0
 2            Cyclopterus lumpus           2           0           0             2
 3  Hippoglossoides platessoides        8214           0           0          6890
@@ -135,13 +135,13 @@ data_example <- function(data="M1") {
 }
 #' Scientific notation labels for log-space ggplots
 #'
-#' This function creates axis labels in scientific notation for ggplot2 plots when 
-#' working with logarithmic or exponential scales. The labels are formatted as powers of 10 
+#' This function creates axis labels in scientific notation for ggplot2 plots when
+#' working with logarithmic or exponential scales. The labels are formatted as powers of 10
 #' (e.g., `10^1`, `10^2`, `10^3`), making them more readable and appropriate for log-scaled axes.
 #'
 #' @param x A numeric vector of values that need to be formatted in scientific notation.
 #'
-#' @return A vector of expressions formatted in scientific notation (e.g., `10^1`, `10^2`), 
+#' @return A vector of expressions formatted in scientific notation (e.g., `10^1`, `10^2`),
 #'   suitable for use as axis labels in ggplot2.
 #' @export
 #'
@@ -165,18 +165,18 @@ scientific_10 <- function(x) {
 
 mutate_indices <- function(data, index_column) {
 	data <- data %>%
-		ungroup() %>% 
+		ungroup() %>%
 		group_by(.data[[index_column]]) %>%
-		mutate(index = cur_group_id()) %>% 
+		mutate(index = cur_group_id()) %>%
 		ungroup()
-	
+
 	return(data)
 }
 #' Extract Model Parameters from Stan Output (M1 & M2)
 #'
 #' This function extracts specific model parameters from the Stan model M1 and M2 output.
 #'
-#' @param stanMod A `stanfit` object containing the results of the model fitting, 
+#' @param stanMod A `stanfit` object containing the results of the model fitting,
 #'   typically produced by `run_M1`.
 #'
 #' @return A `data.frame` containing the extracted parameters: `alpha_0`, `alpha_1`, `eta_0`, `eta_1`, `gamma_0`, and `gamma_1`.
@@ -214,10 +214,10 @@ est_ss_quant_extract <- function(stanMod){
 		tibble::rownames_to_column("sample_index") %>%
 		mutate(sample_index = stringr::str_extract(sample_index, "\\d+")) %>%
 		mutate(sample_index=as.numeric(sample_index)) %>%
-		left_join(.,stan_data_M2$label,by="sample_index") %>% 
+		left_join(.,stan_data_M2$label,by="sample_index") %>%
 		rename(C_est_log="mean") %>%
 		rename(C_est_log_se="se_mean") %>%
-		rename(C_est_log_sd="sd") %>% 
+		rename(C_est_log_sd="sd") %>%
 		select(sample_index,Sample_name,C_est_log,C_est_log_se,C_est_log_sd)
 	return(output)
 }
@@ -227,15 +227,15 @@ amp_eff_param_extract <- function(stanMod){
 }
 #' Extract amplification efficiencies from Stan Model 3
 #'
-#' This function extracts the amplification efficiencies calculated by Stan Model 3 
-#' and formats the results for further analysis. The output includes the pre-PCR and 
-#' post-PCR values, as well as the estimated amplification efficiencies with their 
+#' This function extracts the amplification efficiencies calculated by Stan Model 3
+#' and formats the results for further analysis. The output includes the pre-PCR and
+#' post-PCR values, as well as the estimated amplification efficiencies with their
 #' associated confidence intervals.
 #'
-#' @param stan_data A `list` of data formatted as required by Stan Model 3, typically 
+#' @param stan_data A `list` of data formatted as required by Stan Model 3, typically
 #'   produced by the `prep_stan_M3` function.
-#' @param amp_eff_param A `list` or `data.frame` containing the amplification efficiency 
-#'   parameters estimated by Stan Model 3. Typically, this includes the mean and standard 
+#' @param amp_eff_param A `list` or `data.frame` containing the amplification efficiency
+#'   parameters estimated by Stan Model 3. Typically, this includes the mean and standard
 #'   deviation (`sd`) of the amplification efficiency estimates.
 #'
 #' @return A `data.frame` containing the following columns:
@@ -252,13 +252,13 @@ amp_eff_param_extract <- function(stanMod){
 #' # Extract amplification efficiencies from the Stan Model 3 output
 #' amp_eff_output <- amp_eff_output_extract(stan_data = stan_data_M3, amp_eff_param = amp_eff_param)
 amp_eff_output_extract <- function(stan_data,amp_eff_param){
-	output <- stan_data$alr_M5 %>% as.data.frame() %>% exp() %>% 
-		cbind(.,rowMeans(stan_data$Y_M5),stan_data$Species) %>% 
+	output <- stan_data$alr_M5 %>% as.data.frame() %>% exp() %>%
+		cbind(.,rowMeans(stan_data$Y_M5),stan_data$Species) %>%
 		as.data.frame() %>%
 		setNames(c("Pre-PCR","Post-PCR","Species")) %>% rownames_to_column("x") %>% select(-x) %>% column_to_rownames("Species") %>%
 		mutate(`Post-PCR_est`=exp(galr(`Pre-PCR`)+(40*amp_eff_param$mean)))%>% rel.ab() %>%
-		mutate(amp_eff=exp(40*amp_eff_param$mean)) %>% round(.,2) %>% 
-		mutate(amp_eff_lo=exp(40*(amp_eff_param$mean-amp_eff_param$sd))) %>% round(.,2) %>% 
+		mutate(amp_eff=exp(40*amp_eff_param$mean)) %>% round(.,2) %>%
+		mutate(amp_eff_lo=exp(40*(amp_eff_param$mean-amp_eff_param$sd))) %>% round(.,2) %>%
 		mutate(amp_eff_up=exp(40*(amp_eff_param$mean+amp_eff_param$sd))) %>% round(.,2)
 	return(output)
 }
@@ -280,7 +280,7 @@ est_ini_prop_extract <- function(stanMod){
 sample_variance_extract <- function(est_ini_prop,amp_eff_param,stan_data,stanMod){
 	modeled_prop <- est_ini_prop+make_matrix(amp_eff_param$mean*stan_data$NPCR,ncol(est_ini_prop)) %>% as.data.frame()
 	modeled_prop <- expand_matrix_by_idx(modeled_prop,stan_data$st_idx_M6 %>% sort())
-	
+
 	error_term <- extract_matrix(stanMod,"eta_M6")
 	obs_prop <- modeled_prop+error_term
 	diff_prop <- rel.ab(exp(obs_prop)) - rel.ab(exp(modeled_prop))
@@ -315,13 +315,13 @@ est_ini_conc_sd_extract_5_2 <- function(stanMod,stan_data){
 #' This function prepares the data required to run Stan Model 1 by filtering
 #' the input data and selecting the necessary columns.
 #'
-#' @param data A `data.frame` containing the qPCR data. It should include the 
+#' @param data A `data.frame` containing the qPCR data. It should include the
 #'   Ct values and standard (initial) concentrations.
-#' @param Ct A `character` string specifying the name of the column in `data` 
+#' @param Ct A `character` string specifying the name of the column in `data`
 #'   that contains the Ct values. qPCR non-detects should be defined as 'Undetermined' and not NA or any other value
-#' @param standard_concentration A `character` string specifying the name of the 
+#' @param standard_concentration A `character` string specifying the name of the
 #'   column in `data` that contains the standard concentrations.
-#' 
+#'
 #' @return A list formatted as required by the Stan model.
 #' @export
 #'
@@ -333,20 +333,20 @@ prep_stan_M1 <- function(data, Ct, standard_concentration) {
 	qpcr_g <- data %>%
 		rename(Ct = .data[[Ct]]) %>%
 		rename(st_conc = .data[[standard_concentration]])
-	
+
 	if (sum(qpcr_g$Ct=="Undetermined")==0) {
 		cat("\n");questions("Are the undetermined CT values called \"Undetermined\"?",col = 31)
 	}
 	qpcr_g <- qpcr_g %>%
 		mutate(Ct = replace(Ct, Ct == "Undetermined", NA)) %>%
-		mutate(Ct = as.numeric(Ct)) %>% 
-		mutate(pres = 1, pres = replace(pres, is.na(Ct), 0)) %>% 
+		mutate(Ct = as.numeric(Ct)) %>%
+		mutate(pres = 1, pres = replace(pres, is.na(Ct), 0)) %>%
 		mutate(st_conc=as.numeric(st_conc))
-	
+
 	st_qpcr <- qpcr_g
-	
+
 	st_qpcr_cm <- st_qpcr %>% filter(pres==1)
-	
+
 	stan_data <- list(
 		N_st_q = nrow(st_qpcr),
 		N_st_qp = nrow(st_qpcr_cm),
@@ -363,15 +363,15 @@ prep_stan_M1 <- function(data, Ct, standard_concentration) {
 
 #' Run Stan Model 1
 #'
-#' This function runs Stan Model 1 using the prepared data and optionally 
+#' This function runs Stan Model 1 using the prepared data and optionally
 #' generates plots of the model's outputs.
 #'
 #' @param stan_object A `stanmodel` object representing the compiled Stan model (M1).
 #' @param stan_data A `list` of data formatted for input into the Stan model,
 #'   produced by `prep_stan_M1`.
 #' @param plot_fig A `logical` value indicating whether to generate plots of the
-#'   model's outputs after fitting the model. Defaults to `TRUE`. If `TRUE`, the 
-#'   function will generate and display the output plots; if `FALSE`, no plots 
+#'   model's outputs after fitting the model. Defaults to `TRUE`. If `TRUE`, the
+#'   function will generate and display the output plots; if `FALSE`, no plots
 #'   will be produced.
 #'
 #' @return An object of class `stanfit` containing the results of the model fitting.
@@ -395,7 +395,7 @@ run_M1 <- function(stan_object=M1,stan_data=stan_data_M1,plot_fig=T){
 	)
 	ss_param <<- ss_param_extract(stanMod = stanMod_1)
 	if (plot_fig==T) {
-	plot_ss_param(stan_data=stan_data_M1,ss_param=ss_param,xmin_log,xmax_log)
+	plot_ss_param(stan_data=stan_data,ss_param=ss_param,xmin_log,xmax_log)
 	}
 }
 #' Plot Probability of Detection
@@ -404,13 +404,13 @@ run_M1 <- function(stan_object=M1,stan_data=stan_data_M1,plot_fig=T){
 #' based on the Stan model's output.
 #' @param stan_data A `list` of data formatted for input into the Stan model,
 #'   produced by `prep_stan_M1`.
-#' @param ss_param A vector of output (unknown) parameters produced by fitting 
+#' @param ss_param A vector of output (unknown) parameters produced by fitting
 #'   the Stan model through `run_M1`. It can also be retrieved by `ss_param_extract`.
-#' @param xmin_log A `numeric` value specifying the lower bound of the DNA concentration 
-#'   range to be plotted on a logarithmic scale. If not provided, it defaults to 
+#' @param xmin_log A `numeric` value specifying the lower bound of the DNA concentration
+#'   range to be plotted on a logarithmic scale. If not provided, it defaults to
 #'   the floor of the minimum DNA concentration in `stan_data`.
-#' @param xmax_log A `numeric` value specifying the upper bound of the DNA concentration 
-#'   range to be plotted on a logarithmic scale. If not provided, it defaults to 
+#' @param xmax_log A `numeric` value specifying the upper bound of the DNA concentration
+#'   range to be plotted on a logarithmic scale. If not provided, it defaults to
 #'   the rounded maximum DNA concentration in `stan_data`.
 #'
 #' @return A `ggplot` object showing the probability of detection along the DNA concentration.
@@ -422,8 +422,8 @@ plot_ss_param_pd <- function(stan_data,ss_param,xmin_log,xmax_log){
 	if(missing(xmin_log)) xmin_log <- floor(min(stan_data$S_q))
 	if(missing(xmax_log)) xmax_log <- round(max(stan_data$S_q))
 	samp_point <- cbind(stan_data$S_q,stan_data$Z_qst) %>% as.data.frame() %>% setNames(c("x","y"))
-	pp <- data.frame(x = seq(xmin_log, xmax_log, by = 0.1)) %>% mutate(prob_d_logit=ss_param$mean[1]+(ss_param$mean[2]*x)) %>% 
-		mutate(prob_d=inverselogit(prob_d_logit)) %>% 
+	pp <- data.frame(x = seq(xmin_log, xmax_log, by = 0.1)) %>% mutate(prob_d_logit=ss_param$mean[1]+(ss_param$mean[2]*x)) %>%
+		mutate(prob_d=inverselogit(prob_d_logit)) %>%
 		ggplot(.,aes(x=10^x,y=prob_d))+
 		geom_line()+
 		geom_jitter(data=samp_point,aes(x = 10^x,y=y),width = 0.09, height = 0.03,color="red")+
@@ -440,13 +440,13 @@ plot_ss_param_pd <- function(stan_data,ss_param,xmin_log,xmax_log){
 #' along the DNA concentration range, based on the Stan model's output.
 #' @param stan_data A `list` of data formatted for input into the Stan model,
 #'   produced by `prep_stan_M1`.
-#' @param ss_param A vector of output (unknown) parameters produced by fitting 
+#' @param ss_param A vector of output (unknown) parameters produced by fitting
 #'   the Stan model through `run_M1`. It can also be retrieved by `ss_param_extract`.
-#' @param xmin_log A `numeric` value specifying the lower bound of the DNA concentration 
-#'   range to be plotted on a logarithmic scale. If not provided, it defaults to 
+#' @param xmin_log A `numeric` value specifying the lower bound of the DNA concentration
+#'   range to be plotted on a logarithmic scale. If not provided, it defaults to
 #'   the floor of the minimum DNA concentration in `stan_data`.
-#' @param xmax_log A `numeric` value specifying the upper bound of the DNA concentration 
-#'   range to be plotted on a logarithmic scale. If not provided, it defaults to 
+#' @param xmax_log A `numeric` value specifying the upper bound of the DNA concentration
+#'   range to be plotted on a logarithmic scale. If not provided, it defaults to
 #'   the rounded maximum DNA concentration in `stan_data`.
 #'
 #' @return A `ggplot` object showing the continuous model predictions and observed Ct values
@@ -459,10 +459,10 @@ plot_ss_param_cm <- function(stan_data,ss_param,xmin_log,xmax_log){
 	if(missing(xmin_log)) xmin_log <- floor(min(stan_data$S_q))
 	if(missing(xmax_log)) xmax_log <- round(max(stan_data$S_q))
 	samp_point <- cbind(stan_data$S_q_p,stan_data$R_qst) %>% as.data.frame() %>% setNames(c("x","y"))
-	pp <- data.frame(x = seq(xmin_log, xmax_log, by = 0.1)) %>% mutate(ct=ss_param$mean[3]+(ss_param$mean[4]*x)) %>% 
-		mutate(sigma=exp(ss_param$mean[5]+(ss_param$mean[6] * x))) %>% 
-		mutate(ct_max=ct+sigma) %>% 
-		mutate(ct_min=ct-sigma) %>% 
+	pp <- data.frame(x = seq(xmin_log, xmax_log, by = 0.1)) %>% mutate(ct=ss_param$mean[3]+(ss_param$mean[4]*x)) %>%
+		mutate(sigma=exp(ss_param$mean[5]+(ss_param$mean[6] * x))) %>%
+		mutate(ct_max=ct+sigma) %>%
+		mutate(ct_min=ct-sigma) %>%
 		ggplot()+
 		geom_line(aes(x=10^x,y=ct))+
 		geom_line(aes(x=10^x,y=ct_max),lty=2)+
@@ -478,21 +478,21 @@ plot_ss_param_cm <- function(stan_data,ss_param,xmin_log,xmax_log){
 #' Plot Model Parameters
 #'
 #' This function creates a plot of the model parameters based on the Stan output,
-#' including both the probability of detection and the continuous model along 
+#' including both the probability of detection and the continuous model along
 #' the DNA concentration range.
 #'
 #' @param stan_data A `list` of data formatted for input into the Stan model,
 #'   produced by `prep_stan_M1`.
-#' @param ss_param A vector of output (unknown) parameters produced by fitting 
+#' @param ss_param A vector of output (unknown) parameters produced by fitting
 #'   the Stan model through `run_M1`. It can also be retrieved by `ss_param_extract`.
-#' @param xmin_log A `numeric` value specifying the lower bound of the DNA concentration 
-#'   range to be plotted on a logarithmic scale. If not provided, it defaults to 
+#' @param xmin_log A `numeric` value specifying the lower bound of the DNA concentration
+#'   range to be plotted on a logarithmic scale. If not provided, it defaults to
 #'   the floor of the minimum DNA concentration in `stan_data`.
-#' @param xmax_log A `numeric` value specifying the upper bound of the DNA concentration 
-#'   range to be plotted on a logarithmic scale. If not provided, it defaults to 
+#' @param xmax_log A `numeric` value specifying the upper bound of the DNA concentration
+#'   range to be plotted on a logarithmic scale. If not provided, it defaults to
 #'   the rounded maximum DNA concentration in `stan_data`.
 #'
-#' @return A `ggplot` object showing the probability of detection (left) and 
+#' @return A `ggplot` object showing the probability of detection (left) and
 #'   the continuous model (right) along the DNA concentration (x-axis).
 #' @export
 #'
@@ -515,21 +515,21 @@ plot_ss_param <- function(stan_data,ss_param,xmin_log,xmax_log){
 #' the input data, selecting the necessary columns, and formatting the data
 #' to include both standard and unknown (environmental) qPCR samples.
 #'
-#' @param data A `data.frame` containing the qPCR data. It should include the 
-#'   Ct values, sample types (e.g., "STANDARD", "UNKNOWN"), sample names, and 
+#' @param data A `data.frame` containing the qPCR data. It should include the
+#'   Ct values, sample types (e.g., "STANDARD", "UNKNOWN"), sample names, and
 #'   standard (initial) concentrations.
 #' @param sample_type A `character` string specifying the name of the column in `data`
-#'   that indicates the type of sample (e.g., "STANDARD" for standard samples 
+#'   that indicates the type of sample (e.g., "STANDARD" for standard samples
 #'   and "UNKNOWN" for environmental samples).
-#' @param Ct A `character` string specifying the name of the column in `data` 
-#'   that contains the Ct values. qPCR non-detects should be defined as 'Undetermined' 
+#' @param Ct A `character` string specifying the name of the column in `data`
+#'   that contains the Ct values. qPCR non-detects should be defined as 'Undetermined'
 #'   and not NA or any other value.
-#' @param sample_name_column A `character` string specifying the name of the column 
+#' @param sample_name_column A `character` string specifying the name of the column
 #'   in `data` that contains the unique sample names or identifiers (index).
-#' @param standard_concentration A `character` string specifying the name of the 
-#'   column in `data` that contains the standard concentrations for the standard samples. 
+#' @param standard_concentration A `character` string specifying the name of the
+#'   column in `data` that contains the standard concentrations for the standard samples.
 #'   This column should be numeric and have NA values for environmental samples. If not it will be converted to numeric within the function.
-#' 
+#'
 #' @return A list formatted as required by the Stan model.
 #' @export
 #'
@@ -546,40 +546,40 @@ prep_stan_M2 <- function(data, sample_type, Ct, sample_name_column, standard_con
 		rename(Sample_name = .data[[sample_name_column]]) %>%
 		rename(st_conc = .data[[standard_concentration]])
 
-	
+
 	if (sum(qpcr_g$Ct=="Undetermined")==0) {
 		cat("\n");questions("Are the undetermined CT values called \"Undetermined\"?",col = 31);cat("\n")
 	}
 	qpcr_g <- qpcr_g %>%
 		mutate(Ct = replace(Ct, Ct == "Undetermined", NA)) %>%
-		mutate(Ct = as.numeric(Ct)) %>% 
+		mutate(Ct = as.numeric(Ct)) %>%
 		mutate(pres = 1, pres = replace(pres, is.na(Ct), 0))
-	
+
 	if (sum(grepl("STANDARD",qpcr_g$sample_type))==0) {
 		cat("\n");questions("Are the standard samples included and called \"STANDARD\"?",col = 31);cat("\n")
 	}
-	
+
 	if (sum(grepl("UNKNOWN",qpcr_g$sample_type))==0) {
 		cat("\n");questions("Are the environmental samples included and called \"UNKNOWN\"?",col = 31);cat("\n")
 	}
-	
+
 	e_qpcr <-  qpcr_g %>% filter(sample_type=="UNKNOWN")
-	st_qpcr <- qpcr_g %>% filter(sample_type=="STANDARD") %>% 
+	st_qpcr <- qpcr_g %>% filter(sample_type=="STANDARD") %>%
 		mutate(st_conc=as.numeric(st_conc))
 
-	e_qpcr <- mutate_indices(data = e_qpcr, 
-													 index_column = "Sample_name") %>% 
+	e_qpcr <- mutate_indices(data = e_qpcr,
+													 index_column = "Sample_name") %>%
 		rename(sample_index="index")
-	
+
 	# st_qpcr <- mutate_indices(data = st_qpcr,
-	# 													index_column = "Sample_name") %>% 
+	# 													index_column = "Sample_name") %>%
 	# 	rename(sample_index="index")
-	
+
 	e_qpcr_cm <- e_qpcr %>% filter(pres==1)
 	st_qpcr_cm <- st_qpcr %>% filter(pres==1)
-	
+
 	label <- e_qpcr %>% distinct(sample_index,Sample_name) %>% arrange(sample_index) %>% as.data.frame()
-	
+
 	stan_data <- list(
 		N_st_q = nrow(st_qpcr),
 		N_en_q = nrow(e_qpcr),
@@ -599,7 +599,7 @@ prep_stan_M2 <- function(data, sample_type, Ct, sample_name_column, standard_con
 		R_qst = as.numeric(st_qpcr_cm$Ct),
 		R_qen = as.numeric(e_qpcr_cm$Ct),
 		S_q_p = log10(st_qpcr_cm$st_conc),
-		# 
+		#
 		label_M2 = label
 	)
 	return(stan_data)
@@ -612,8 +612,8 @@ prep_stan_M2 <- function(data, sample_type, Ct, sample_name_column, standard_con
 #' The y-axis can be displayed on a logarithmic scale if specified.
 #'
 #' @param est_ss_quant A `data.frame` containing the estimated DNA concentrations and their standard deviations derived from `est_ss_quant_extract` function.
-#' @param scale A `character` string specifying whether the y-axis should be on a logarithmic scale. 
-#'   Defaults to `"log"`. If `scale = "log"`, the y-axis will be displayed on a logarithmic scale; 
+#' @param scale A `character` string specifying whether the y-axis should be on a logarithmic scale.
+#'   Defaults to `"log"`. If `scale = "log"`, the y-axis will be displayed on a logarithmic scale;
 #'   otherwise, a linear scale will be used.
 #'
 #' @return A `ggplot` object showing the estimated DNA concentrations with error bars.
@@ -653,11 +653,11 @@ plot_est_ss_quant <- function(est_ss_quant,scale="log"){
 #' @param stan_data A `list` of data formatted for input into the Stan model,
 #'   produced by `prep_stan_M2`.
 #' @param plot_fig A `logical` value indicating whether to generate plots of the
-#'   model's outputs after fitting the model. Defaults to `TRUE`. If `TRUE`, the 
-#'   function will generate and display the output plots; if `FALSE`, no plots 
+#'   model's outputs after fitting the model. Defaults to `TRUE`. If `TRUE`, the
+#'   function will generate and display the output plots; if `FALSE`, no plots
 #'   will be produced.
 #'
-#' @return An object of class `stanfit` containing the results of the model fitting. 
+#' @return An object of class `stanfit` containing the results of the model fitting.
 #' The model runs 4 chains, 5000 iterations and burns 2000 for warm-up. For changing these values run the analog version of this function
 #' @export
 #'
@@ -676,11 +676,11 @@ run_M2 <- function(stan_object=M2, stan_data=stan_data_M2,plot_fig=T){
 		warmup = 2000,
 		data = stan_data
 	)
-	
+
 	ss_param <<- ss_param_extract(stanMod = stanMod_2)
-	
+
 	est_ss_quant <<- est_ss_quant_extract(stanMod_2)
-	
+
 	if (plot_fig==T) {
 	cowplot::plot_grid(plot_ss_param(stan_data_M2,ss_param,xmin_log,xmax_log),
 										 plot_est_ss_quant(est_ss_quant),nrow=2)
@@ -689,29 +689,29 @@ run_M2 <- function(stan_object=M2, stan_data=stan_data_M2,plot_fig=T){
 
 #' Prepare Data for Stan Model 3
 #'
-#' This function prepares the data required to run Stan Model 3 by selecting and formatting 
-#' the necessary columns. Model 3 (M3) uses ONLY mock community sequencing data and their initial 
+#' This function prepares the data required to run Stan Model 3 by selecting and formatting
+#' the necessary columns. Model 3 (M3) uses ONLY mock community sequencing data and their initial
 #' concentrations to estimate the amplification efficiency (α) relative to a reference species.
 #'
-#' @param data A `data.frame` containing the mock community data, including columns for 
+#' @param data A `data.frame` containing the mock community data, including columns for
 #'   sequencing counts, initial concentrations, species indices, and species names. See more in 'data_example(data = M3)'.
 #' @param mock_species_names A `character` string specifying the name of the column(s) in `data`
 #'   that contains the species names in the mock community.
-#' @param mock_sequencing_columns A `character` string or a `vector` of characters specifying the 
+#' @param mock_sequencing_columns A `character` string or a `vector` of characters specifying the
 #'   columns in `data` that contain the sequencing counts for the mock community species.
 #' @param mock_initial_concentration A `character` string specifying the name of the column in `data`
-#'   that contains the initial concentrations of the mock community species. This column should be numeric. 
+#'   that contains the initial concentrations of the mock community species. This column should be numeric.
 #'   Note that this model only runs with ONE mock mix (one set of initial proportions for the mock cocktail mix).
-#' @param species_index A `character` string specifying the name of the column in `data` 
+#' @param species_index A `character` string specifying the name of the column in `data`
 #'   that contains the indices or identifiers for the species in the mock community.
-#' @param number_of_PCR A `numeric` value specifying the number of PCR cycles conducted during the experiment. 
+#' @param number_of_PCR A `numeric` value specifying the number of PCR cycles conducted during the experiment.
 #'   Defaults to `40`.
-#' @param tau_mu A numeric value specifying the mean of the prior distribution for the 
+#' @param tau_mu A numeric value specifying the mean of the prior distribution for the
 #'   error term (η) in the model. Defaults to `1000`. It is recommended to keep `tau_mu` and `tau_sd` in a 1:10 ratio, but you may adjust these values as needed.
-#' @param tau_sd A numeric value specifying the standard deviation of the prior distribution 
+#' @param tau_sd A numeric value specifying the standard deviation of the prior distribution
 #'   for the error term (η) in the model. Defaults to `10000`.
 #'
-#' @return A list formatted as required by Stan Model 3, ready for input into the model. 
+#' @return A list formatted as required by Stan Model 3, ready for input into the model.
 #' The computations in this model run in natural log space (ln).
 #' @export
 #'
@@ -724,10 +724,10 @@ run_M2 <- function(stan_object=M2, stan_data=stan_data_M2,plot_fig=T){
 #'                              number_of_PCR = 40,
 #'                              tau_mu = 1000,
 #'                              tau_sd = 10000)
-prep_stan_M3 <- function(data, 
-												 mock_species_names, 
-												 mock_sequencing_columns, 
-												 mock_initial_concentration, 
+prep_stan_M3 <- function(data,
+												 mock_species_names,
+												 mock_sequencing_columns,
+												 mock_initial_concentration,
 												 species_index,
 												 number_of_PCR=40,
 												 tau_mu=1000,
@@ -740,9 +740,9 @@ prep_stan_M3 <- function(data,
 		select({{ species_index }})
 	mock_sp_names <- data %>%
 		select({{ mock_species_names }})
-	
+
 	ini_mock$prop <- galr(ini_mock[,1],log="e")
-	
+
 	stan_data <- list(
 		############## Integers
 		N_sp_i_MC2 = nrow(species_idx),
@@ -764,19 +764,19 @@ prep_stan_M3 <- function(data,
 
 plot_amp_eff <- function(amp_eff_output){
 	n_sp <- nrow(amp_eff_output)
-	plot1_data <- amp_eff_output %>% select("Pre-PCR","Post-PCR") %>% trans() %>% 
+	plot1_data <- amp_eff_output %>% select("Pre-PCR","Post-PCR") %>% trans() %>%
 		setNames(c("Species","Sample","Reads"))
-	
+
 	plot1_data$Sample <- factor(plot1_data$Sample, levels=c("Pre-PCR", "Post-PCR"))
-	
+
 	p1 <- ggplot(plot1_data,aes(fill=Species,y=Reads,x=Sample))+
 		geom_bar(position="stack", stat="identity")+
 		scale_fill_manual(values = moma.colors("Lupi", n=n_sp))+
 		theme_bw()+
 		theme(legend.position = "none")+
 		labs(y = "Proportional abundance (%)", x = "")
-	
-	p1_leg <- 
+
+	p1_leg <-
 		suppressWarnings(
 			cowplot::get_legend(p1 +
 														theme(legend.position = "right",
@@ -784,10 +784,10 @@ plot_amp_eff <- function(amp_eff_output){
 																	text = element_text(size = 13),
 																	legend.text = element_text(face = "italic")))
 		)
-	
-	
+
+
 	plot2_data <- plot1_data %>% mutate(line_t=if_else(Species==rownames(amp_eff_output)[nrow(amp_eff_output)],"solid","dashed"))
-	
+
 	p2 <- ggplot(data = plot2_data %>% filter(Sample %in% c("Pre-PCR", "Post-PCR")),
 							 aes(x = Sample, y = Reads, group = Species)) +
 		geom_line(aes(linetype = line_t),
@@ -822,17 +822,17 @@ plot_amp_eff <- function(amp_eff_output){
 							axis.title.x = element_text(size = 10),
 							axis.text.x = element_text(angle = 90),
 							text = element_text(size = 13))))
-	
+
 	p_leg_1 <- suppressWarnings(cowplot::plot_grid(p1_leg,p2_leg,ncol = 1,rel_heights = c(1,1),align = "v"))
-	
+
 	plot3_data <-
-		amp_eff_output %>% select("amp_eff", "amp_eff_lo", "amp_eff_up") %>% rownames_to_column("Species") %>% 
-		mutate(co=moma.colors("Lupi",nrow(.))) %>% 
-		arrange(desc(row_number())) %>% 
+		amp_eff_output %>% select("amp_eff", "amp_eff_lo", "amp_eff_up") %>% rownames_to_column("Species") %>%
+		mutate(co=moma.colors("Lupi",nrow(.))) %>%
+		arrange(desc(row_number())) %>%
 		mutate(Species=factor(Species, levels=c(Species)))
-	
+
 	p3 <-
-		plot3_data %>% 
+		plot3_data %>%
 		ggplot()+
 		geom_point(aes(x=amp_eff,y=Species),color=plot3_data$co,size=2)+
 		geom_errorbar(aes(y=Species,xmin=amp_eff_lo,xmax=amp_eff_up),
@@ -843,19 +843,19 @@ plot_amp_eff <- function(amp_eff_output){
 		theme(axis.text.y = element_text(face = "italic"),
 					text = element_text(size = 13))+
 		geom_vline(xintercept = 1,linetype="dashed",color=plot3_data$co[1])
-	
+
 	pp1 <- cowplot::plot_grid(p1,p2,p3,p_leg_1,nrow = 1,align = "h",rel_widths = c(2,3,6,2))
 	return(pp1)
 }
 
 
 plot_mock_variance <- function(mock_variance){
-	plot4_data <- mock_variance %>% arrange(desc(row_number())) %>% 
-		trans() %>% setNames(c("Species","Sample","prop_diff")) %>% 
-		mutate(co=if_else(prop_diff<0,"tomato2","grey")) %>% 
-		mutate(co=if_else(prop_diff>0,"deepskyblue2",co)) %>% 
+	plot4_data <- mock_variance %>% arrange(desc(row_number())) %>%
+		trans() %>% setNames(c("Species","Sample","prop_diff")) %>%
+		mutate(co=if_else(prop_diff<0,"tomato2","grey")) %>%
+		mutate(co=if_else(prop_diff>0,"deepskyblue2",co)) %>%
 		mutate(prop_diff=abs(prop_diff))
-	
+
 	p4 <- ggplot(data=plot4_data)+
 		geom_point(aes(x = as.factor(Sample), y = Species, size = prop_diff),color=plot4_data$co)+
 		scale_size_continuous(range = c(2, 10))+
@@ -865,7 +865,7 @@ plot_mock_variance <- function(mock_variance){
 		theme(axis.text.x = element_text(angle = 90),
 					legend.position = "none")+
 		labs(title=expression("Error term " * eta * " expressed as difference in %"))
-	
+
 	p4_leg <- suppressWarnings(
 		cowplot::get_legend(
 			p4+
@@ -874,7 +874,7 @@ plot_mock_variance <- function(mock_variance){
 							axis.text.x = element_text(angle = 90),
 							text = element_text(size = 13)))
 	)
-	
+
 	p5_leg <- suppressWarnings(
 		cowplot::get_legend(
 			ggplot() +
@@ -897,9 +897,9 @@ plot_mock_variance <- function(mock_variance){
 							legend.justification = c(0.5,3)
 				))
 	)
-	
+
 	p_leg_2 <- cowplot::plot_grid(p4_leg,p5_leg,ncol = 1,rel_heights = c(4,1))
-	
+
 	pp2 <- cowplot::plot_grid(p4,p_leg_2,nrow = 1,rel_widths = c(7,1))
 	return(pp2)
 }
@@ -917,11 +917,11 @@ run_M3 <- function(stan_object=M3,stan_data=stan_data_M3,plot_fig=T){
 	)
 
 	amp_eff_param <<- amp_eff_param_extract(stanMod = stanMod_3)
-	
+
 	amp_eff_output <<- amp_eff_output_extract(stan_data = stan_data,amp_eff_param = amp_eff_param)
-	
+
 	mock_variance <<- mock_variance_extract(stan_data = stan_data,stanMod = stanMod_3,amp_eff_param = amp_eff_param)
-	
+
 	if (plot_fig==T) {
 	return(plot_amp_eff(amp_eff_output))
 	}
@@ -932,9 +932,9 @@ prep_stan_M4 <- function(data,
 												 otu_species_names,
 												 sample_index,
 												 number_of_PCR = 40,
-												 tau_en_mu=1000, 
-												 tau_en_sd=10000, 
-												 ini_prop_mu=0, 
+												 tau_en_mu=1000,
+												 tau_en_sd=10000,
+												 ini_prop_mu=0,
 												 ini_prop_sd=5) {
 	mock <- data$Y_M5
 	ini_mock <- data$mock_initial_conc
@@ -965,7 +965,7 @@ prep_stan_M4 <- function(data,
 			questions("Removed the following species from mock commuinty samples",col=31);cat("\n")
 			writeLines(paste0(c(1:(length(mock_sp_names[l1,]))),".",mock_sp_names[l1,]));cat("\n")
 		}
-	
+
 	l2 <- otu_sp_names$Species %notin% mock_sp_names$Species
 	if(sum(l2)==0){
 		cat("\n");cat("All species in OTU table are present in mock commuinty samples");cat("\n")}else{
@@ -975,27 +975,27 @@ prep_stan_M4 <- function(data,
 			questions("Removed the following species from OTU table",col=31);cat("\n")
 			writeLines(paste0(c(1:(length(otu_sp_names[l2,]))),".",otu_sp_names[l2,]));cat("\n")
 		}
-	
+
 	mock_sp_names <- mock_sp_names %>% filter(!l1)
-	otu_sp_names <- otu_sp_names %>% filter(!l2) 
-	
+	otu_sp_names <- otu_sp_names %>% filter(!l2)
+
 	mock <- mock %>% filter(!l1)
 	ini_mock <- ini_mock %>% filter(!l1)
 	species_idx <- species_idx %>% filter(!l1)
 	otu <- otu %>% filter(!l2)
-	
+
 	ini_mock$prop <- galr(ini_mock$i_c,log="e")
-	
+
 	if(sum(diff(species_idx$idx)>1)>0){
 		cat("\n");questions("The indexing is not continuous",31);cat("\n")
 		cat("Making the index continuous...");cat("\n")
 		species_idx <- c(1:nrow(species_idx)) %>% as.data.frame() %>% setNames("idx")
 	}
-	
+
 	label <- cbind(as.data.frame(st_idx) %>% setNames("sample_index"),
 		as.data.frame(colnames(otu)) %>% setNames("Sample_name")
 	)
-	
+
 	stan_data <- list(
 		############## Integers
 		N_st_M6 = max(st_idx),
@@ -1027,7 +1027,7 @@ prep_stan_M4 <- function(data,
 plot_est_ini_prop <- function(est_ini_prop,stan_data){
 	plot1_data <- est_ini_prop %>% cbind(.,stan_data$Species) %>% rownames_to_column("x") %>% select(-x) %>%
 		column_to_rownames("Species") %>% exp() %>% rel.ab() %>% trans() %>% setNames(c("Species","Sample","prop"))
-	
+
 	p1 <- ggplot(plot1_data,aes(fill=Species,y=prop,x=Sample))+
 		geom_bar(position="stack", stat="identity")+
 		scale_fill_manual(values = moma.colors("Lupi", n=nrow(est_ini_prop)))+
@@ -1039,14 +1039,14 @@ plot_est_ini_prop <- function(est_ini_prop,stan_data){
 					# axis.text.x = element_text(angle = 90),
 					text = element_text(size = 13),
 					legend.text = element_text(face = "italic"))
-	
+
 	return(p1)
 }
 plot_obs_prop <- function(stan_data) {
-	plot1_data <- stan_data$Y_M6 %>% cbind(.,stan_data$Species) %>% 
-		column_to_rownames("Species") %>% setNames(stan_data$Station_name_indexed) %>% 
+	plot1_data <- stan_data$Y_M6 %>% cbind(.,stan_data$Species) %>%
+		column_to_rownames("Species") %>% setNames(stan_data$Station_name_indexed) %>%
 		rel.ab() %>% trans() %>% setNames(c("Species","Sample","prop"))
-	
+
 	p1 <- ggplot(plot1_data,aes(fill=Species,y=prop,x=Sample))+
 		geom_bar(position="stack", stat="identity")+
 		scale_fill_manual(values = moma.colors("Lupi", n=nrow(est_ini_prop)))+
@@ -1066,7 +1066,7 @@ plot_sample_variance <- function(sample_variance){
 		mutate(co=if_else(prop_diff<0,"tomato2","grey")) %>%
 		mutate(co=if_else(prop_diff>0,"deepskyblue2",co)) %>%
 		mutate(prop_diff=abs(prop_diff))
-	
+
 	p2 <- ggplot(data=plot2_data)+
 		geom_point(aes(x = as.factor(Sample), y = Species, size = prop_diff),color=plot2_data$co)+
 		scale_size_continuous(range = c(2, 10))+
@@ -1076,14 +1076,14 @@ plot_sample_variance <- function(sample_variance){
 		theme(axis.text.x = element_text(angle = 90),
 					legend.position = "none")+
 		labs(title=expression("Error term " * eta * " expressed as difference in %"))
-	
+
 	p2_leg <- cowplot::get_legend(
 		p2+
 			theme(legend.position = "right",
 						axis.title.x = element_text(size = 10),
 						axis.text.x = element_text(angle = 90),
 						text = element_text(size = 13)))
-	
+
 	p3_leg <- cowplot::get_legend(
 		ggplot() +
 			geom_point(aes(x = NA, y = NA, color = "Underestimation"), size = 1) +
@@ -1104,17 +1104,17 @@ plot_sample_variance <- function(sample_variance){
 						text = element_text(size = 13),
 						legend.justification = c(0.5,3)
 			))
-	
+
 	p_leg_2 <- cowplot::plot_grid(p2_leg,p3_leg,ncol = 1,rel_heights = c(4,1))
-	
+
 	pp2 <- cowplot::plot_grid(p2,p_leg_2,nrow = 1,rel_widths = c(7,1))
-	
+
 	return(pp2)
 }
 run_M4 <- function(stan_object=M4,
 									 stan_data = stan_data_M4,
 									 plot_fig=T){
-	
+
 	stanMod_4 <<- sampling(
 		object = stan_object,
 		chains = 4,
@@ -1122,17 +1122,17 @@ run_M4 <- function(stan_object=M4,
 		warmup = 2000,
 		data = stan_data
 	)
-	
+
 	amp_eff_param <<- amp_eff_param_extract(stanMod = stanMod_4)
-	
+
 	amp_eff_output <<- amp_eff_output_extract(stan_data = stan_data_M4,amp_eff_param = amp_eff_param)
-	
+
 	est_ini_prop <<- est_ini_prop_extract(stanMod = stanMod_4)
-	
+
 	mock_variance <<- mock_variance_extract(stan_data = stan_data_M4,stanMod = stanMod_4,amp_eff_param = amp_eff_param)
-	
+
 	sample_variance <<- sample_variance_extract(est_ini_prop = est_ini_prop,amp_eff_param = amp_eff_param,stan_data = stan_data_M4,stanMod = stanMod_4)
-	
+
 	if (plot_fig==T) {
 		return(plot_est_ini_prop(est_ini_prop = est_ini_prop,stan_data = stan_data_M4))
 	}
@@ -1148,16 +1148,16 @@ plot_est_ini_conc <- function(est_ini_conc, est_ini_conc_sd, stan_data, k=2){
 		est_ini_conc <- est_ini_conc %>% setNames(colnames(stan_data$Y_M6))
 		est_ini_conc_sd <- est_ini_conc_sd %>% setNames(colnames(stan_data$Y_M6))
 	}
-	
-	plot1_data_1 <- est_ini_conc %>% cbind(.,stan_data$"Species") %>% column_to_rownames("Species") %>% 
-		trans() %>% setNames(c("Species","Sample","C")) 
-	plot1_data_2 <- est_ini_conc_sd %>% cbind(.,stan_data$"Species") %>% column_to_rownames("Species") %>% 
+
+	plot1_data_1 <- est_ini_conc %>% cbind(.,stan_data$"Species") %>% column_to_rownames("Species") %>%
+		trans() %>% setNames(c("Species","Sample","C"))
+	plot1_data_2 <- est_ini_conc_sd %>% cbind(.,stan_data$"Species") %>% column_to_rownames("Species") %>%
 		trans() %>% setNames(c("Species","Sample","C_sd"))
-	
-	plot1_data <- left_join(plot1_data_1,plot1_data_2,by = c("Species" = "Species","Sample" = "Sample")) %>% 
-		mutate(c_lo=C-C_sd) %>% 
-		mutate(c_up=C+C_sd) 
-	
+
+	plot1_data <- left_join(plot1_data_1,plot1_data_2,by = c("Species" = "Species","Sample" = "Sample")) %>%
+		mutate(c_lo=C-C_sd) %>%
+		mutate(c_up=C+C_sd)
+
 	nr <- nrow(est_ini_conc)*k
 	nudge_vector <- c(1:nrow(est_ini_conc))*(1/nr)-(max(c(1:nrow(est_ini_conc))*(1/nr))/2)
 	p1 <- ggplot(data=plot1_data)+
@@ -1168,7 +1168,7 @@ plot_est_ini_conc <- function(est_ini_conc, est_ini_conc_sd, stan_data, k=2){
 		theme(legend.text = element_text(face = "italic"),
 					axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
 		labs(y=expression("Log"[e]*"(DNA Concentration)"),x="Sample")
-	
+
 	return(p1)
 }
 run_M5_1 <- function(stan_data_M5_1,chains,iterations,warmup,plot_fig=T){
@@ -1176,7 +1176,7 @@ run_M5_1 <- function(stan_data_M5_1,chains,iterations,warmup,plot_fig=T){
 	if(missing(chains)) chains <- 4
 	if(missing(iterations)) iterations <- 10000
 	if(missing(warmup)) warmup <- 5000
-	
+
 	stanMod_5_1 <<- stan(
 		file = "M5_1.stan",
 		model_name = "M5.1 model",
@@ -1185,18 +1185,18 @@ run_M5_1 <- function(stan_data_M5_1,chains,iterations,warmup,plot_fig=T){
 		warmup = warmup,
 		data = stan_data_M5_1
 	)
-	
+
 	amp_eff_param <<- amp_eff_param_extract(stanMod = stanMod_5_1)
-	
+
 	amp_eff_output <<- amp_eff_output_extract(stan_data = stan_data_M5_1,amp_eff_param = amp_eff_param)
-	
+
 	est_ini_conc <<- est_ini_conc_extract_5_1(stanMod_5_1,stan_data_M5_1)
 	est_ini_conc_sd <<- est_ini_conc_sd_extract_5_1(stanMod_5_1) %>% rbind(.,rep(0,ncol(.)))
-	
+
 	mock_variance <<- mock_variance_extract(stan_data = stan_data_M5_1,stanMod = stanMod_5_1,amp_eff_param = amp_eff_param)
-	
+
 	sample_variance <<- sample_variance_extract(est_ini_prop = est_ini_conc,amp_eff_param = amp_eff_param,stan_data = stan_data_M5_1,stanMod = stanMod_5_1)
-	
+
 	if (plot_fig==T) {
 		plot_est_ini_conc(est_ini_conc, stan_data_M5_1, k=5)
 		}
@@ -1211,7 +1211,7 @@ run_M5_2 <- function(stan_data_M5_2,chains,iterations,warmup,plot_fig=T){
 	if(missing(chains)) chains <- 4
 	if(missing(iterations)) iterations <- 10000
 	if(missing(warmup)) warmup <- 5000
-	
+
 	stanMod_5_2 <<- stan(
 		file = "M5_2.stan",
 		model_name = "M5.2 model",
@@ -1220,18 +1220,18 @@ run_M5_2 <- function(stan_data_M5_2,chains,iterations,warmup,plot_fig=T){
 		warmup = 5000,
 		data = stan_data_M5_2
 	)
-	
+
 	amp_eff_param <<- amp_eff_param_extract(stanMod = stanMod_5_2)
-	
+
 	amp_eff_output <<- amp_eff_output_extract(stan_data = stan_data_M5_2,amp_eff_param = amp_eff_param)
-	
+
 	est_ini_conc <<- est_ini_conc_extract_5_2(stanMod_5_2,stan_data_M5_2)
 	est_ini_conc_sd <<- est_ini_conc_sd_extract_5_2(stanMod_5_2,stan_data_M5_2)
-	
+
 	mock_variance <<- mock_variance_extract(stan_data = stan_data_M5_2,stanMod = stanMod_5_2,amp_eff_param = amp_eff_param)
-	
+
 	sample_variance <<- sample_variance_extract(est_ini_prop = est_ini_conc,amp_eff_param = amp_eff_param,stan_data = stan_data_M5_2,stanMod = stanMod_5_2)
-	
+
 	if (plot_fig==T) {
 		plot_est_ini_conc(est_ini_conc, est_ini_conc_sd, stan_data_M5_2, k=3)
 	}
@@ -1244,7 +1244,7 @@ arrange_by_sp_idx <- function(data, species_idx) {
 		select(-idx) %>%
 		column_to_rownames("Species")
 	return(data)
-} 
+}
 
 galr <- function(x,log="e"){
 	temp <- vector("numeric",length(x))
@@ -1482,12 +1482,12 @@ data {
 	// Intigers
   int N_sp_i_MC2; // Number of species
   int N_obs_Y_M5; // Number of samples included in mock community
-  // 
+  //
   // Data
   vector[N_sp_i_MC2] alr_M5; // Additive log(e)-ratio of initial concentration of mock community
   int Y_M5[N_sp_i_MC2,N_obs_Y_M5]; // Sequence reads of mock community samples
   int NPCR;  // Number of PCR reactions
-  // 
+  //
   // Parameters
   real tau_eta_mock_mu; // dispersion parameter of eta
   real tau_eta_mock_sd; // dispersion parameter of eta
@@ -1771,7 +1771,7 @@ data {
   real tau_eta_samp_sd;
   real ini_prop_mu;
   real ini_prop_sd;
-  // 
+  //
   //Numbers of dimentions
   int N_st_q; // Total number of observation in qPCR standard samples
   int N_en_q; // Total number of observation in qPCR environmental samples
@@ -1793,7 +1793,7 @@ data {
   real R_qst[N_st_qp]; // Ct values of qPCR standard data for only detected samples
   real R_qen[N_en_qp]; // Ct values of qPCR environmental data for only detected samples
   real S_q_p[N_st_qp]; // Known concentration (log10) in qPCR data for only detected samples
-  // 
+  //
 }
 parameters {
   //////////////////////////////////////////// Model Compartment 2
@@ -1906,7 +1906,7 @@ model {
   // // // Continuous (Ct) model compartment
   R_qst ~ normal(mu_st,sigma_st);//Standards
   R_qen ~ normal(mu_en,sigma_en);//Field samples
-  // 
+  //
   //////////////////////////////////////////// Model compartment 2
   // Model 5
   for (i in 1:N_obs_Y_M5){
@@ -1990,11 +1990,11 @@ load_model <- function(model = 'M1') {
 		M5_1 = list(code = M5_1_stan_code, name = "M5.1 model"),
 		M5_2 = list(code = M5_2_stan_code, name = "M5.2 model")
 	)
-	
+
 	if (!model %in% names(model_list)) {
 		stop("Invalid model name. Choose from 'M1', 'M2', 'M3', 'M4', 'M5_1', 'M5_2'.")
 	}
-	
+
 	model_info <- model_list[[model]]
 	stan_model(model_code = model_info$code, model_name = model_info$name)
 }
