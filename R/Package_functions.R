@@ -1211,19 +1211,16 @@ prep_stan_M5_2 <- function(stan_data_M2,stan_data_M4){
 	output <- c(stan_data_M2, stan_data_M4)
 	return(output)
 }
-run_M5_2 <- function(stan_data_M5_2,chains,iterations,warmup,plot_fig=T){
-	if(missing(plot_fig)) plot_fig <- F
-	if(missing(chains)) chains <- 4
-	if(missing(iterations)) iterations <- 10000
-	if(missing(warmup)) warmup <- 5000
+run_M5_2 <- function(stan_object=M5_2,
+										 stan_data=stan_data_M5_2,
+										 plot_fig=T){
 
-	stanMod_5_2 <<- stan(
-		file = "M5_2.stan",
-		model_name = "M5.2 model",
+	stanMod_5_2 <<- sampling(
+		object = M5_2,
 		chains = 4,
-		iter = 10000,
-		warmup = 5000,
-		data = stan_data_M5_2
+		iter = 5000,
+		warmup = 2000,
+		data = stan_data
 	)
 
 	amp_eff_param <<- amp_eff_param_extract(stanMod = stanMod_5_2)
