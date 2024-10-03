@@ -766,6 +766,79 @@ prep_stan_M3 <- function(data,
 	return(stan_data)
 }
 
+#' Prepare Data for Stan Model 3_2
+#'
+#' This function prepares the data required to run Stan Model 3 by selecting and formatting
+#' the necessary columns. Model 3 (M3) uses ONLY mock community sequencing data and their initial
+#' concentrations to estimate the amplification efficiency (α) relative to a reference species.
+#'
+#' @param data A `data.frame` containing the mock community data, including columns for
+#'   sequencing counts, initial concentrations, species indices, and species names. See more in 'data_example(data = M3)'.
+#' @param mock_species_names A `character` string specifying the name of the column(s) in `data`
+#'   that contains the species names in the mock community.
+#' @param mock_sequencing_columns A `character` string or a `vector` of characters specifying the
+#'   columns in `data` that contain the sequencing counts for the mock community species.
+#' @param mock_initial_concentration A `character` string specifying the name of the column in `data`
+#'   that contains the initial concentrations of the mock community species. This column should be numeric.
+#'   Note that this model only runs with ONE mock mix (one set of initial proportions for the mock cocktail mix).
+#' @param species_index A `character` string specifying the name of the column in `data`
+#'   that contains the indices or identifiers for the species in the mock community.
+#' @param number_of_PCR A `numeric` value specifying the number of PCR cycles conducted during the experiment.
+#'   Defaults to `40`.
+#' @param tau_mu A numeric value specifying the mean of the prior distribution for the
+#'   error term (η) in the model. Defaults to `1000`. It is recommended to keep `tau_mu` and `tau_sd` in a 1:10 ratio, but you may adjust these values as needed.
+#' @param tau_sd A numeric value specifying the standard deviation of the prior distribution
+#'   for the error term (η) in the model. Defaults to `10000`.
+#'
+#' @return A list formatted as required by Stan Model 3, ready for input into the model.
+#' The computations in this model run in natural log space (ln).
+#' @export
+#'
+#' @examples
+		#' stan_data_M3 <- prep_stan_M3_2(data = mock_data,
+#'                              mock_species_names = "species_names",
+#'                              mock_sequencing_columns = c("mock_samp_1", "mock_samp_2", "mock_samp_3"),
+#'                              mock_initial_concentration = "initial_concentration",
+#'                              species_index = "species_index",
+#'                              number_of_PCR = 40,
+#'                              tau_mu = 1000,
+#'                              tau_sd = 10000)
+prep_stan_M3_2 <- function(data,
+												 mock_species_names,
+												 mock_sequencing_columns,
+												 mock_initial_concentration,
+												 species_index,
+												 number_of_PCR=40,
+												 alpha_magnitude=0.001) {
+	mock <- data %>%
+		select({{ mock_sequencing_columns }})
+	ini_mock <- data %>%
+		select({{ mock_initial_concentration }}) %>% setNames("i_c")
+	species_idx <- data %>%
+		select({{ species_index }})
+	mock_sp_names <- data %>%
+		select({{ mock_species_names }})
+
+	ini_mock$prop <- galr(ini_mock[,1],log="e")
+
+	stan_data <- list(
+		############## Integers
+		N_sp_i_MC2 = nrow(species_idx),
+		N_obs_Y_M5 = ncol(mock),
+		############## Data
+		alr_M5 = ini_mock$prop,
+		Y_M5 = mock,
+		NPCR = number_of_PCR,
+		############## Parameters
+		alpha_magnitude = alpha_magnitude, #increase or decrease this value for easier fit
+		############## Other parameters
+		Species = mock_sp_names,
+		mock_initial_conc = ini_mock,
+		species_idx = species_idx
+	);str(stan_data)
+	return(stan_data)
+}
+
 plot_amp_eff <- function(amp_eff_output){
 	n_sp <- nrow(amp_eff_output)
 	plot1_data <- amp_eff_output %>% select("Pre-PCR","Post-PCR") %>% trans() %>%
@@ -1565,7 +1638,7 @@ data {
   int NPCR;  // Number of PCR reactions
   //
   // Parameters
-  real tau_eta_mock_sd; // dispersion parameter of eta
+  real alpha_magnitude; // dispersion parameter of eta
 }
 parameters {
   vector[N_sp_i_MC2-1] alpha_raw;
@@ -1574,7 +1647,7 @@ transformed parameters{
   matrix[N_sp_i_MC2,N_obs_Y_M5] gamma_M5;
   matrix[N_sp_i_MC2,N_obs_Y_M5] psi_M5;
   vector[N_sp_i_MC2] alpha;
-  alpha[1:(N_sp_i_MC2-1)] = alpha_raw * tau_eta_mock_sd;
+  alpha[1:(N_sp_i_MC2-1)] = alpha_raw * alpha_magnitude;
   alpha[N_sp_i_MC2] = 0;
   for (i in 1:N_obs_Y_M5){
     for(j in 1:N_sp_i_MC2){
