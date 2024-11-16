@@ -1476,7 +1476,7 @@ M1_stan_code <- "
 data {
   int N_st_q; // Total number of observation in qPCR standard samples
   int N_st_qp; // Total number of observation in qPCR standard samples for only detected samples
-  int Z_qst[N_st_q]; // Presence/Absence response of qPCR standard data
+  array[N_st_q] int Z_qst; // Presence/Absence response of qPCR standard data
   array[N_st_q] real S_q; // Known concentration (log10) in qPCR data
   array[N_st_qp] real R_qst; // Ct values of qPCR standard data for only detected samples
   array[N_st_qp] real S_q_p; // Known concentration (log10) in qPCR data for only detected samples
