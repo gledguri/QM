@@ -1432,14 +1432,54 @@ post_explore_matrix_M4 <- function(stanmod,param){
 # Model's code ------------------------------------------------------------
 
 # M1 stan code ------------------------------------------------------------
+# M1_stan_code <- "
+# data {
+#   int N_st_q; // Total number of observation in qPCR standard samples
+#   int N_st_qp; // Total number of observation in qPCR standard samples for only detected samples
+#   int Z_qst[N_st_q]; // Presence/Absence response of qPCR standard data
+#   real S_q[N_st_q]; // Known concentration (log10) in qPCR data
+#   real R_qst[N_st_qp]; // Ct values of qPCR standard data for only detected samples
+#   real S_q_p[N_st_qp]; // Known concentration (log10) in qPCR data for only detected samples
+# }
+# parameters {
+#   real alpha_0;
+#   real alpha_1;
+#   real eta_0;
+#   real eta_1;
+#   real gamma_0;
+#   real<upper=0> gamma_1;
+# }
+# transformed parameters{
+#   vector[N_st_q] theta_st;
+#   vector[N_st_qp] mu_st;
+#   vector[N_st_qp] sigma_st;
+#   for (i in 1:N_st_q){
+#     theta_st[i] = alpha_0 + (alpha_1 * S_q[i]);
+#   }
+#   for (i in 1:N_st_qp){
+#     mu_st[i] = eta_0 + (eta_1 * S_q_p[i]);
+#     sigma_st[i] = exp(gamma_0+(gamma_1 * S_q_p[i]));
+#   }
+# }
+# model {
+#   Z_qst ~ bernoulli(inv_logit(theta_st));
+#   R_qst ~ normal(mu_st,sigma_st);
+#   alpha_0 ~ normal(0, 2);
+#   alpha_1 ~ normal(0, 2);
+#   eta_0 ~ normal(0, 3);
+#   eta_1 ~ normal(-3, 0.1);
+#   gamma_0 ~ normal(0, 0.1);
+#   gamma_1 ~ normal(0, 0.1);
+# }
+# "
 M1_stan_code <- "
 data {
   int N_st_q; // Total number of observation in qPCR standard samples
   int N_st_qp; // Total number of observation in qPCR standard samples for only detected samples
   int Z_qst[N_st_q]; // Presence/Absence response of qPCR standard data
-  real S_q[N_st_q]; // Known concentration (log10) in qPCR data
-  real R_qst[N_st_qp]; // Ct values of qPCR standard data for only detected samples
-  real S_q_p[N_st_qp]; // Known concentration (log10) in qPCR data for only detected samples
+  array[N_st_q] real S_q; // Known concentration (log10) in qPCR data
+  array[N_st_qp] real R_qst; // Ct values of qPCR standard data for only detected samples
+  array[N_st_qp] real S_q_p; // Known concentration (log10) in qPCR data for only detected samples
 }
 parameters {
   real alpha_0;
@@ -1475,6 +1515,103 @@ model {
 
 
 # M2 stan code ------------------------------------------------------------
+# M2_stan_code <- "
+# data {
+#   //Numbers of dimentions
+#   int N_st_q; // Total number of observation in qPCR standard samples
+#   int N_en_q; // Total number of observation in qPCR environmental samples
+#   int N_st_qp; // Total number of observation in qPCR standard samples for only detected samples
+#   int N_en_qp; // Total number of observation in qPCR environmental samples for only detected samples
+#   int N_j; // Number of samples in environmental data
+#   //
+#   //Indexes
+#   // // // Binomial model
+#   int j_qen_idx[N_en_q]; // Species and standard index for qPCR environmental samples
+#   // // // Continious model
+#   int j_qen_p_idx[N_en_qp]; // Species and standard index for qPCR environmental samples
+#   // Data
+#   // // // Binomial model
+#   int Z_qst[N_st_q]; // Presence/Absence response of qPCR standard data
+#   int Z_qen[N_en_q]; // Presence/Absence response of qPCR environmental data
+#   real S_q[N_st_q]; // Known concentration (log10) in qPCR data
+#   // // // Continious model
+#   real R_qst[N_st_qp]; // Ct values of qPCR standard data for only detected samples
+#   real R_qen[N_en_qp]; // Ct values of qPCR environmental data for only detected samples
+#   real S_q_p[N_st_qp]; // Known concentration (log10) in qPCR data for only detected samples
+# }
+# parameters {
+#   // Parameters
+#   // // qPCR
+#   // // // Bernoulli model
+#   real alpha_0;
+#   real alpha_1;
+#   // // // Continous model
+#   real eta_0;
+#   real eta_1;
+#   real gamma_0;
+#   real<upper=0> gamma_1;
+#   vector[N_j] C_q;
+# }
+# transformed parameters{
+#   // Parameters
+#   // // qPCR
+#   // // // Bernoulli model
+#   vector[N_st_q] theta_st;
+#   vector[N_en_q] theta_un;
+#   // // // Continious model
+#   vector[N_st_qp] mu_st;
+#   vector[N_en_qp] mu_en;
+#   vector[N_st_qp] sigma_st;
+#   vector[N_en_qp] sigma_en;
+#   //
+#   // Model TP
+#   // // qPCR model
+#   // // // Bernuli module model compartment
+#   // // // // // Standard
+#   for (i in 1:N_st_q){
+#     theta_st[i] = alpha_0 + (alpha_1 * S_q[i]);
+#   }
+#   // // // // // Unknown
+#   for (i in 1:N_en_q){
+#     theta_un[i] = alpha_0 + (alpha_1 * C_q[j_qen_idx[i]]);
+#   }
+#   // // // Continious model compartment
+#   // // // // Standard
+#   for (i in 1:N_st_qp){
+#     mu_st[i] = eta_0 + (eta_1 * S_q_p[i]);
+#     // sigma_dd_st[i] = sigma_i[species_st_idx_cl[i]];
+#     sigma_st[i] = exp(gamma_0+(gamma_1 * S_q_p[i]));
+#   }
+#   // // // // Unknown
+#   for (i in 1:N_en_qp){
+#     mu_en[i] = eta_0 + (eta_1 * C_q[j_qen_p_idx[i]]);
+#     // sigma_dd_st[i] = sigma_i[species_st_idx_cl[i]];
+#     sigma_en[i] = exp(gamma_0+(gamma_1 * C_q[j_qen_p_idx[i]]));
+#   }
+# }
+# model {
+#   // Model
+#   // // qPCR
+#   // // // Bernoulli model
+#   Z_qst ~ bernoulli(inv_logit(theta_st)); //Standards
+#   Z_qen ~ bernoulli(inv_logit (theta_un)); //Environmental samples
+#   // // // Continuous (Ct) model compartment
+#   R_qst ~ normal(mu_st,sigma_st);//Standards
+#   R_qen ~ normal(mu_en,sigma_en);//Field samples
+#   //
+#   // Priors
+#   // // qPCR
+#   // // // Bernoulli model
+#   alpha_0 ~ normal(0, 2);
+#   alpha_1 ~ normal(0, 2);
+#   // // // Continious model
+#   eta_0 ~ normal(0, 3);
+#   eta_1 ~ normal(-3, 0.1);
+#   gamma_0 ~ normal(0, 0.1);
+#   gamma_1 ~ normal(0, 0.1);
+#   C_q ~ normal(0,3);
+# }
+# "
 M2_stan_code <- "
 data {
   //Numbers of dimentions
@@ -1486,18 +1623,18 @@ data {
   //
   //Indexes
   // // // Binomial model
-  int j_qen_idx[N_en_q]; // Species and standard index for qPCR environmental samples
+  array[N_en_q] int j_qen_idx; // Species and standard index for qPCR environmental samples
   // // // Continious model
-  int j_qen_p_idx[N_en_qp]; // Species and standard index for qPCR environmental samples
+  array[N_en_qp] int j_qen_p_idx; // Species and standard index for qPCR environmental samples
   // Data
   // // // Binomial model
-  int Z_qst[N_st_q]; // Presence/Absence response of qPCR standard data
-  int Z_qen[N_en_q]; // Presence/Absence response of qPCR environmental data
-  real S_q[N_st_q]; // Known concentration (log10) in qPCR data
+  array[N_st_q] int Z_qst; // Presence/Absence response of qPCR standard data
+  array[N_en_q] int Z_qen; // Presence/Absence response of qPCR environmental data
+  array[N_st_q] real S_q; // Known concentration (log10) in qPCR data
   // // // Continious model
-  real R_qst[N_st_qp]; // Ct values of qPCR standard data for only detected samples
-  real R_qen[N_en_qp]; // Ct values of qPCR environmental data for only detected samples
-  real S_q_p[N_st_qp]; // Known concentration (log10) in qPCR data for only detected samples
+  array[N_st_qp] real R_qst; // Ct values of qPCR standard data for only detected samples
+  array[N_en_qp] real R_qen; // Ct values of qPCR environmental data for only detected samples
+  array[N_st_qp] real S_q_p; // Known concentration (log10) in qPCR data for only detected samples
 }
 parameters {
   // Parameters
