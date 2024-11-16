@@ -1,3 +1,31 @@
+#' Inverse Logit Transformation
+#'
+#' This function computes the inverse logit transformation for a given numeric input.
+#' It is often used to transform linear predictions from a logistic regression
+#' model back to probabilities.
+#'
+#' @param x A numeric vector, matrix, or scalar for which the inverse logit transformation
+#'   is to be computed.
+#'
+#' @return A numeric vector, matrix, or scalar of the same dimensions as `x`, containing the
+#'   inverse logit transformation values. The values will range between 0 and 1.
+#' @export
+#'
+#' @examples
+#' # Compute inverse logit for a single value
+#' result <- inverselogit(0)
+#' 
+#' # Compute inverse logit for a vector of values
+#' result <- inverselogit(c(-2, 0, 2))
+#' 
+#' # Apply inverse logit to a matrix
+#' mat <- matrix(c(-1, 0, 1), ncol = 3)
+#' result <- inverselogit(mat)
+inverselogit <- function (x) 
+{
+	return(1 / (1 + exp(-x)))
+}
+
 #' Extract model parameters
 #'
 #' This function extracts and summarizes parameters from a fitted Stan model.
