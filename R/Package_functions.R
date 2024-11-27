@@ -1832,20 +1832,18 @@ transformed parameters{
   // // // // Standard
   for (i in 1:N_st_qp){
     mu_st[i] = eta_0 + (eta_1 * S_q_p[i]);
-    // sigma_dd_st[i] = sigma_i[species_st_idx_cl[i]];
     sigma_st[i] = exp(gamma_0+(gamma_1 * S_q_p[i]));
   }
   // // // // Unknown
   for (i in 1:N_en_qp){
     mu_en[i] = eta_0 + (eta_1 * C_q[j_qen_p_idx[i]]);
-    // sigma_dd_st[i] = sigma_i[species_st_idx_cl[i]];
     sigma_en[i] = exp(gamma_0+(gamma_1 * C_q[j_qen_p_idx[i]]));
   }
 }
 model {
   // Model
   // // qPCR
-  // // // Bernoulli model
+  // // // Bernoulli model model compartment
   Z_qst ~ bernoulli(inv_logit(theta_st)); //Standards
   Z_qen ~ bernoulli(inv_logit (theta_un)); //Environmental samples
   // // // Continuous (Ct) model compartment
@@ -1858,9 +1856,9 @@ model {
   alpha_0 ~ normal(0, 2);
   alpha_1 ~ normal(0, 2);
   // // // Continious model
-  eta_0 ~ normal(0, 3);
-  eta_1 ~ normal(-3, 0.1);
-  gamma_0 ~ normal(0, 0.1);
+  eta_0 ~ normal(0, 10);
+  eta_1 ~ normal(0, 3);
+  gamma_0 ~ normal(1, 0.1);
   gamma_1 ~ normal(0, 0.1);
   C_q ~ normal(0,3);
 }
