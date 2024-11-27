@@ -1845,7 +1845,7 @@ model {
   // // qPCR
   // // // Bernoulli model model compartment
   Z_qst ~ bernoulli(inv_logit(theta_st)); //Standards
-  Z_qen ~ bernoulli(inv_logit (theta_un)); //Environmental samples
+  Z_qen ~ bernoulli(inv_logit(theta_un)); //Environmental samples
   // // // Continuous (Ct) model compartment
   R_qst ~ normal(mu_st,sigma_st);//Standards
   R_qen ~ normal(mu_en,sigma_en);//Field samples
@@ -1853,13 +1853,13 @@ model {
   // Priors
   // // qPCR
   // // // Bernoulli model
-  alpha_0 ~ normal(0, 2);
-  alpha_1 ~ normal(0, 2);
+  alpha_0 ~ normal(0, 1);
+  alpha_1 ~ normal(0, 1);
   // // // Continious model
-  eta_0 ~ normal(0, 10);
-  eta_1 ~ normal(0, 3);
-  gamma_0 ~ normal(1, 0.1);
-  gamma_1 ~ normal(0, 0.1);
+  eta_0 ~ normal(40, 10);
+  eta_1 ~ normal(-3, 1);
+  gamma_0 ~ normal(1, 3);
+  gamma_1 ~ normal(0, 3);
   C_q ~ normal(0,3);
 }
 "
