@@ -618,7 +618,7 @@ prep_stan_M2 <- function(data, sample_type, Ct, sample_name_column, standard_con
 		N_st_qp = nrow(st_qpcr_cm),
 		N_en_qp = nrow(e_qpcr_cm),
 		#
-		N_j = le(e_qpcr$sample_index),
+		N_j = length(unique(e_qpcr$sample_index)),
 		#
 		j_qen_idx = e_qpcr$sample_index,
 		#
