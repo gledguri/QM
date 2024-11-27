@@ -13,8 +13,8 @@ run_M1(stan_object = M1, stan_data = stan_data_M1, plot_fig = T)
 produced by `prep_stan_M1`.}
 
 \item{plot_fig}{A `logical` value indicating whether to generate plots of the
-model's outputs after fitting the model. Defaults to `TRUE`. If `TRUE`, the 
-function will generate and display the output plots; if `FALSE`, no plots 
+model's outputs after fitting the model. Defaults to `TRUE`. If `TRUE`, the
+function will generate and display the output plots; if `FALSE`, no plots
 will be produced.}
 }
 \value{
@@ -22,7 +22,7 @@ An object of class `stanfit` containing the results of the model fitting.
 The model runs 4 chains, 5000 iterations and burns 2000 for warm-up. For changing these values run the analog version of this function
 }
 \description{
-This function runs Stan Model 1 using the prepared data and optionally 
+This function runs Stan Model 1 using the prepared data and optionally
 generates plots of the model's outputs.
 }
 \examples{

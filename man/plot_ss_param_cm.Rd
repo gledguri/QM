@@ -10,15 +10,15 @@ plot_ss_param_cm(stan_data, ss_param, xmin_log, xmax_log)
 \item{stan_data}{A `list` of data formatted for input into the Stan model,
 produced by `prep_stan_M1`.}
 
-\item{ss_param}{A vector of output (unknown) parameters produced by fitting 
+\item{ss_param}{A vector of output (unknown) parameters produced by fitting
 the Stan model through `run_M1`. It can also be retrieved by `ss_param_extract`.}
 
-\item{xmin_log}{A `numeric` value specifying the lower bound of the DNA concentration 
-range to be plotted on a logarithmic scale. If not provided, it defaults to 
+\item{xmin_log}{A `numeric` value specifying the lower bound of the DNA concentration
+range to be plotted on a logarithmic scale. If not provided, it defaults to
 the floor of the minimum DNA concentration in `stan_data`.}
 
-\item{xmax_log}{A `numeric` value specifying the upper bound of the DNA concentration 
-range to be plotted on a logarithmic scale. If not provided, it defaults to 
+\item{xmax_log}{A `numeric` value specifying the upper bound of the DNA concentration
+range to be plotted on a logarithmic scale. If not provided, it defaults to
 the rounded maximum DNA concentration in `stan_data`.}
 }
 \value{

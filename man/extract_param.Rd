@@ -4,22 +4,22 @@
 \alias{extract_param}
 \title{Extract model parameters}
 \usage{
-extract_param(model = stanMod, parmeter = "alpha")
+extract_param(model, par)
 }
 \arguments{
 \item{model}{A `stanfit` object containing the results of the model fitting}
 
-\item{parmeter}{A `character` string specifying the name of the parameter to be extracted 
+\item{parmeter}{A `character` string specifying the name of the parameter to be extracted
 from the model. Defaults to `"alpha"`.}
 }
 \value{
-A `data.frame` containing the summarized statistics for the specified 
-  parameter(s), including mean, standard error, quantiles (2.5%, 25%, 50%, 75%, 97.5%), 
+A `data.frame` containing the summarized statistics for the specified
+  parameter(s), including mean, standard error, quantiles (2.5%, 25%, 50%, 75%, 97.5%),
   effective sample size (n_eff), and Rhat.
 }
 \description{
 This function extracts and summarizes parameters from a fitted Stan model.
-The function returns a data frame containing the mean, standard error, quantiles, 
+The function returns a data frame containing the mean, standard error, quantiles,
 number of effective samples, and Rhat value for the specified parameter(s).
 }
 \examples{

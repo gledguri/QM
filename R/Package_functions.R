@@ -14,14 +14,14 @@
 #' @examples
 #' # Compute inverse logit for a single value
 #' result <- inverselogit(0)
-#' 
+#'
 #' # Compute inverse logit for a vector of values
 #' result <- inverselogit(c(-2, 0, 2))
-#' 
+#'
 #' # Apply inverse logit to a matrix
 #' mat <- matrix(c(-1, 0, 1), ncol = 3)
 #' result <- inverselogit(mat)
-inverselogit <- function (x) 
+inverselogit <- function (x)
 {
 	return(1 / (1 + exp(-x)))
 }
@@ -193,6 +193,21 @@ scientific_10 <- function(x) {
 	t2 <- gsub("10\\^\\+", "10\\^", t)
 	str2expression(t2)}
 
+
+#' Group and Add Index to a Data Frame
+#'
+#' This function groups a data frame by a specified column and adds an index to each group.
+#'
+#' @param data A data frame to be processed.
+#' @param index_column A character string specifying the name of the column to group by.
+#'
+#' @return A data frame with an added column `index` that assigns a unique ID to each group.
+#' @export
+#'
+#' @examples
+#' # Example usage
+#' df <- data.frame(group = c("A", "A", "B", "B", "C"), value = 1:5)
+#' mutate_indices(df, "group")
 mutate_indices <- function(data, index_column) {
 	data <- data %>%
 		ungroup() %>%
@@ -252,6 +267,19 @@ est_ss_quant_extract <- function(stanMod){
 		select(sample_index,Sample_name,C_est_log,C_est_log_se,C_est_log_sd)
 	return(output)
 }
+
+#' Extract Amplification Efficiency Parameters
+#'
+#' This function extracts amplification efficiency parameters from a fitted Stan model.
+#'
+#' @param stanMod A `stanfit` object containing the results of the model fitting.
+#'
+#' @return A data frame containing the summary statistics of the amplification efficiency parameters.
+#' @export
+#'
+#' @examples
+#' # Extract amplification efficiency parameters
+#' amp_eff_param <- amp_eff_param_extract(stanMod)
 amp_eff_param_extract <- function(stanMod){
 	output <- methods::selectMethod("summary", signature = "stanfit")(object = stanMod, par = 'alpha')
 	output <- output$summary %>% as.data.frame() %>% as.data.frame()
@@ -295,6 +323,21 @@ amp_eff_output_extract <- function(stan_data,amp_eff_param){
 	return(output)
 }
 
+#' Extract Mock Variance
+#'
+#' This function calculates the difference between observed and modeled proportional abundances
+#' for mock community samples.
+#'
+#' @param stan_data A list containing the mock community data formatted for Stan.
+#' @param stanMod A `stanfit` object containing the results of the model fitting.
+#' @param amp_eff_param A data frame containing amplification efficiency parameters.
+#'
+#' @return A data frame containing the differences in proportions between modeled and observed values.
+#' @export
+#'
+#' @examples
+#' # Extract mock variance
+#' mock_variance <- mock_variance_extract(stan_data, stanMod, amp_eff_param)
 mock_variance_extract <- function(stan_data,stanMod,amp_eff_param){
 	modeled_prop <- (stan_data$alr_M5+(amp_eff_param$mean*stan_data$NPCR)) %>% as.data.frame()
 	error_term <- extract_matrix(stanMod,"eta_M5")
@@ -305,10 +348,41 @@ mock_variance_extract <- function(stan_data,stanMod,amp_eff_param){
 		column_to_rownames("Species")
 	return(diff_prop)
 }
+
+#' Extract Initial Proportions
+#'
+#' This function extracts the initial proportional abundances for species in a mock community
+#' from a fitted Stan model.
+#'
+#' @param stanMod A `stanfit` object containing the results of the model fitting.
+#'
+#' @return A data frame representing the initial proportional abundances of species.
+#' @export
+#'
+#' @examples
+#' # Extract initial proportions
+#' est_ini_prop <- est_ini_prop_extract(stanMod)
 est_ini_prop_extract <- function(stanMod){
 	output <- extract_matrix(stanMod,"alr_2") %>% rbind(.,setNames(data.frame(matrix(0,1,ncol(.))),colnames(.)))
 	return(output)
 }
+
+#' Extract Sample Variance
+#'
+#' This function calculates the difference between observed and modeled proportional abundances
+#' for environmental samples.
+#'
+#' @param est_ini_prop A data frame of initial proportional abundances extracted from the Stan model.
+#' @param amp_eff_param A data frame of amplification efficiency parameters.
+#' @param stan_data A list containing the environmental sample data formatted for Stan.
+#' @param stanMod A `stanfit` object containing the results of the model fitting.
+#'
+#' @return A data frame containing the differences in proportions between modeled and observed values for samples.
+#' @export
+#'
+#' @examples
+#' # Extract sample variance
+#' sample_variance <- sample_variance_extract(est_ini_prop, amp_eff_param, stan_data, stanMod)
 sample_variance_extract <- function(est_ini_prop,amp_eff_param,stan_data,stanMod){
 	modeled_prop <- est_ini_prop+make_matrix(amp_eff_param$mean*stan_data$NPCR,ncol(est_ini_prop)) %>% as.data.frame()
 	modeled_prop <- expand_matrix_by_idx(modeled_prop,stan_data$st_idx_M6 %>% sort())
@@ -867,6 +941,19 @@ prep_stan_M3_2 <- function(data,
 	return(stan_data)
 }
 
+#' Plot Amplification Efficiencies
+#'
+#' This function generates plots to visualize amplification efficiencies, including pre-PCR and post-PCR
+#' relative abundances, estimated amplification efficiencies, and their confidence intervals.
+#'
+#' @param amp_eff_output A data frame containing amplification efficiency data extracted from the model.
+#'
+#' @return A `ggplot` object with multiple panels showing amplification efficiency results.
+#' @export
+#'
+#' @examples
+#' # Generate amplification efficiency plots
+#' plot_amp_eff(amp_eff_output)
 plot_amp_eff <- function(amp_eff_output){
 	n_sp <- nrow(amp_eff_output)
 	plot1_data <- amp_eff_output %>% select("Pre-PCR","Post-PCR") %>% trans() %>%
@@ -953,7 +1040,19 @@ plot_amp_eff <- function(amp_eff_output){
 	return(pp1)
 }
 
-
+#' Plot Mock Variance
+#'
+#' This function generates a plot to visualize the variance between modeled and observed
+#' proportional abundances for mock community samples.
+#'
+#' @param mock_variance A data frame containing differences between modeled and observed proportions.
+#'
+#' @return A `ggplot` object showing the variance for each species across samples.
+#' @export
+#'
+#' @examples
+#' # Plot mock variance
+#' plot_mock_variance(mock_variance)
 plot_mock_variance <- function(mock_variance){
 	plot4_data <- mock_variance %>% arrange(desc(row_number())) %>%
 		trans() %>% setNames(c("Species","Sample","prop_diff")) %>%
@@ -1149,7 +1248,7 @@ plot_est_ini_prop <- function(est_ini_prop,stan_data){
 }
 plot_obs_prop <- function(stan_data) {
 	plot1_data <- stan_data$Y_M6 %>% cbind(.,stan_data$Species) %>%
-		column_to_rownames("Species") %>% 
+		column_to_rownames("Species") %>%
 		# setNames(stan_data$Station_name_indexed) %>%
 		rel.ab() %>% trans() %>% setNames(c("Species","Sample","prop"))
 
@@ -1166,6 +1265,20 @@ plot_obs_prop <- function(stan_data) {
 					legend.text = element_text(face = "italic"))
 	return(p1)
 }
+
+#' Plot Sample Variance
+#'
+#' This function generates a plot to visualize the variance between modeled and observed
+#' proportional abundances for environmental samples.
+#'
+#' @param sample_variance A data frame containing differences between modeled and observed proportions.
+#'
+#' @return A `ggplot` object showing the variance for each species across samples.
+#' @export
+#'
+#' @examples
+#' # Plot sample variance
+#' plot_sample_variance(sample_variance)
 plot_sample_variance <- function(sample_variance){
 	plot2_data <- sample_variance %>% arrange(desc(row_number())) %>%
 		trans() %>% setNames(c("Species","Sample","prop_diff")) %>%
@@ -1349,6 +1462,20 @@ arrange_by_sp_idx <- function(data, species_idx) {
 	return(data)
 }
 
+#' Compute Gled's Additive Log-Ratios
+#'
+#' This function computes the generalized additive log-ratios for a vector of values.
+#' It is used for compositional data transformations.
+#'
+#' @param x A numeric vector to transform.
+#' @param log A character string indicating the logarithm base. Use `"e"` for natural log or `10` for base-10 log.
+#'
+#' @return A numeric vector of generalized additive log-ratios.
+#' @export
+#'
+#' @examples
+#' # Compute generalized additive log-ratios
+#' galr(c(1, 2, 3), log = "e")
 galr <- function(x,log="e"){
 	temp <- vector("numeric",length(x))
 	for (i in 1:length(x)) {
@@ -1361,6 +1488,8 @@ galr <- function(x,log="e"){
 	}
 	return(temp)
 }
+
+
 galr_inv_m <- function(data,log="e"){
 	if(log=="e"){
 		temp <- data %>% rbind(.,rep(0,ncol(.))) %>% exp()
@@ -1396,7 +1525,6 @@ galr_inv_m_2 <- function(data,vector){
 	temp <- data %>% rbind(.,vector) %>% exp()
 	return(temp)
 }
-
 
 make_matrix <- function(x,n){
 	return(matrix(x,length(x),n))
@@ -1435,17 +1563,17 @@ mean_by_idx <- function(input,idx){
 }
 
 post_explore_matrix_M4 <- function(stanmod,param){
-	post_explore_data <<- extract_matrix(stanmod,param,'mean') %>% trans() %>% 
+	post_explore_data <<- extract_matrix(stanmod,param,'mean') %>% trans() %>%
 		cbind(.,
 					extract_matrix(stanmod,param,'2.5%') %>% trans() %>% select(Z) %>% rename(q2="Z"),
 					extract_matrix(stanmod,param,'97.5%') %>% trans() %>% select(Z) %>% rename(q98="Z")
-		) %>% mutate(X=as.numeric(X)) %>% 
+		) %>% mutate(X=as.numeric(X)) %>%
 		left_join(.,cbind(stan_data_M4$species_idx,stan_data_M4$Species),
-							by=c('X'='species_idx')) %>% 
+							by=c('X'='species_idx')) %>%
 		mutate(Y=as.numeric(Y))
-	
+
 	p <-
-		post_explore_data %>% 
+		post_explore_data %>%
 		ggplot(aes(x=Y,y=Z,colour = Species))+
 		geom_point()+
 		geom_errorbar(aes(ymin = q2,ymax = q98))+
@@ -2303,7 +2431,7 @@ load_model <- function(model = 'M1') {
 	stan_model(model_code = model_info$code, model_name = model_info$name)
 }
 
-multi_grepl <- function (pattern, x) 
+multi_grepl <- function (pattern, x)
 {
 	grepl(paste(pattern, collapse = "|"), x)
 }
@@ -2324,30 +2452,30 @@ multi_grepl <- function (pattern, x)
 #' @examples
 #' df1 <- data.frame(A = 1:3, B = letters[1:3])
 #' df2 <- data.frame(A = 4:5, C = letters[4:5])
-#' 
+#'
 #' custom_rbind(df1, df2)
-#' 
+#'
 #' @export
 custom_rbind <- function(df1, df2) {
-	
+
 	# Find columns in df1 that are not in df2
 	cols_df1_not_in_df2 <- setdiff(names(df1), names(df2))
-	
+
 	# Find columns in df2 that are not in df1
 	cols_df2_not_in_df1 <- setdiff(names(df2), names(df1))
-	
+
 	# Add missing columns to df2 with NA values
 	if (length(cols_df1_not_in_df2) > 0) {
 		df2[cols_df1_not_in_df2] <- NA
 	}
-	
+
 	# Add missing columns to df1 with NA values
 	if (length(cols_df2_not_in_df1) > 0) {
 		df1[cols_df2_not_in_df1] <- NA
 	}
-	
+
 	# Bind the rows together
 	result <- rbind(df1, df2)
-	
+
 	return(result)
 }

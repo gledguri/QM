@@ -9,20 +9,20 @@ extract_matrix(stanMod, param, vector = "mean")
 \arguments{
 \item{stanMod}{A `stanfit` object containing the results of the model fitting.}
 
-\item{param}{A `character` string specifying the name of the 2-dimensional parameter to be extracted 
+\item{param}{A `character` string specifying the name of the 2-dimensional parameter to be extracted
 from the model (e.g., `"alpha"` for `alpha[m,n]`).}
 
-\item{vector}{A `character` string specifying the summary statistic to be extracted for each element 
-of the matrix. Options might include `"mean"`, `"se_mean"`, `"sd"`, or quantiles (e.g., `"2.5%"`). 
+\item{vector}{A `character` string specifying the summary statistic to be extracted for each element
+of the matrix. Options might include `"mean"`, `"se_mean"`, `"sd"`, or quantiles (e.g., `"2.5%"`).
 Defaults to `"mean"`.}
 }
 \value{
-A `data.frame` representing the 2-dimensional parameter as a matrix, with rows and columns 
+A `data.frame` representing the 2-dimensional parameter as a matrix, with rows and columns
   corresponding to the indices of the parameter.
 }
 \description{
-This function extracts and organizes 2-dimensional parameters (e.g., `alpha[m,n]`) 
-from a fitted Stan model into a matrix format. The user can specify which summary statistic 
+This function extracts and organizes 2-dimensional parameters (e.g., `alpha[m,n]`)
+from a fitted Stan model into a matrix format. The user can specify which summary statistic
 (e.g., mean, standard error) to extract.
 }
 \examples{
