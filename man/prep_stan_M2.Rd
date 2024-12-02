@@ -7,23 +7,23 @@
 prep_stan_M2(data, sample_type, Ct, sample_name_column, standard_concentration)
 }
 \arguments{
-\item{data}{A `data.frame` containing the qPCR data. It should include the 
-Ct values, sample types (e.g., "STANDARD", "UNKNOWN"), sample names, and 
+\item{data}{A `data.frame` containing the qPCR data. It should include the
+Ct values, sample types (e.g., "STANDARD", "UNKNOWN"), sample names, and
 standard (initial) concentrations.}
 
 \item{sample_type}{A `character` string specifying the name of the column in `data`
-that indicates the type of sample (e.g., "STANDARD" for standard samples 
+that indicates the type of sample (e.g., "STANDARD" for standard samples
 and "UNKNOWN" for environmental samples).}
 
-\item{Ct}{A `character` string specifying the name of the column in `data` 
-that contains the Ct values. qPCR non-detects should be defined as 'Undetermined' 
+\item{Ct}{A `character` string specifying the name of the column in `data`
+that contains the Ct values. qPCR non-detects should be defined as 'Undetermined'
 and not NA or any other value.}
 
-\item{sample_name_column}{A `character` string specifying the name of the column 
+\item{sample_name_column}{A `character` string specifying the name of the column
 in `data` that contains the unique sample names or identifiers (index).}
 
-\item{standard_concentration}{A `character` string specifying the name of the 
-column in `data` that contains the standard concentrations for the standard samples. 
+\item{standard_concentration}{A `character` string specifying the name of the
+column in `data` that contains the standard concentrations for the standard samples.
 This column should be numeric and have NA values for environmental samples. If not it will be converted to numeric within the function.}
 }
 \value{

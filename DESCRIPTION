@@ -12,4 +12,7 @@ LazyData: true
 RoxygenNote: 7.3.2
 Imports: 
     dplyr,
-    stringr
+    stringr,
+    rstan,
+    ggplot2,
+    tibble

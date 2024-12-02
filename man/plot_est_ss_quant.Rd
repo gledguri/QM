@@ -9,8 +9,8 @@ plot_est_ss_quant(est_ss_quant, scale = "log")
 \arguments{
 \item{est_ss_quant}{A `data.frame` containing the estimated DNA concentrations and their standard deviations derived from `est_ss_quant_extract` function.}
 
-\item{scale}{A `character` string specifying whether the y-axis should be on a logarithmic scale. 
-Defaults to `"log"`. If `scale = "log"`, the y-axis will be displayed on a logarithmic scale; 
+\item{scale}{A `character` string specifying whether the y-axis should be on a logarithmic scale.
+Defaults to `"log"`. If `scale = "log"`, the y-axis will be displayed on a logarithmic scale;
 otherwise, a linear scale will be used.}
 }
 \value{

@@ -10,12 +10,12 @@ scientific_10(x)
 \item{x}{A numeric vector of values that need to be formatted in scientific notation.}
 }
 \value{
-A vector of expressions formatted in scientific notation (e.g., `10^1`, `10^2`), 
+A vector of expressions formatted in scientific notation (e.g., `10^1`, `10^2`),
   suitable for use as axis labels in ggplot2.
 }
 \description{
-This function creates axis labels in scientific notation for ggplot2 plots when 
-working with logarithmic or exponential scales. The labels are formatted as powers of 10 
+This function creates axis labels in scientific notation for ggplot2 plots when
+working with logarithmic or exponential scales. The labels are formatted as powers of 10
 (e.g., `10^1`, `10^2`, `10^3`), making them more readable and appropriate for log-scaled axes.
 }
 \examples{

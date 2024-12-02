@@ -7,13 +7,13 @@
 prep_stan_M1(data, Ct, standard_concentration)
 }
 \arguments{
-\item{data}{A `data.frame` containing the qPCR data. It should include the 
+\item{data}{A `data.frame` containing the qPCR data. It should include the
 Ct values and standard (initial) concentrations.}
 
-\item{Ct}{A `character` string specifying the name of the column in `data` 
+\item{Ct}{A `character` string specifying the name of the column in `data`
 that contains the Ct values. qPCR non-detects should be defined as 'Undetermined' and not NA or any other value}
 
-\item{standard_concentration}{A `character` string specifying the name of the 
+\item{standard_concentration}{A `character` string specifying the name of the
 column in `data` that contains the standard concentrations.}
 }
 \value{

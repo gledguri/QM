@@ -7,7 +7,7 @@
 ss_param_extract(stanMod)
 }
 \arguments{
-\item{stanMod}{A `stanfit` object containing the results of the model fitting, 
+\item{stanMod}{A `stanfit` object containing the results of the model fitting,
 typically produced by `run_M1`.}
 }
 \value{

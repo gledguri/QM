@@ -7,11 +7,11 @@
 amp_eff_output_extract(stan_data, amp_eff_param)
 }
 \arguments{
-\item{stan_data}{A `list` of data formatted as required by Stan Model 3, typically 
+\item{stan_data}{A `list` of data formatted as required by Stan Model 3, typically
 produced by the `prep_stan_M3` function.}
 
-\item{amp_eff_param}{A `list` or `data.frame` containing the amplification efficiency 
-parameters estimated by Stan Model 3. Typically, this includes the mean and standard 
+\item{amp_eff_param}{A `list` or `data.frame` containing the amplification efficiency
+parameters estimated by Stan Model 3. Typically, this includes the mean and standard
 deviation (`sd`) of the amplification efficiency estimates.}
 }
 \value{
@@ -24,9 +24,9 @@ A `data.frame` containing the following columns:
   - `amp_eff_up`: The upper bound of the amplification efficiency, based on the standard deviation.
 }
 \description{
-This function extracts the amplification efficiencies calculated by Stan Model 3 
-and formats the results for further analysis. The output includes the pre-PCR and 
-post-PCR values, as well as the estimated amplification efficiencies with their 
+This function extracts the amplification efficiencies calculated by Stan Model 3
+and formats the results for further analysis. The output includes the pre-PCR and
+post-PCR values, as well as the estimated amplification efficiencies with their
 associated confidence intervals.
 }
 \examples{
