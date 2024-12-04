@@ -37,4 +37,3 @@ model {
   gamma_0 ~ normal(1, 3);
   gamma_1 ~ normal(0, 3);
 }
-generated quantities{}
