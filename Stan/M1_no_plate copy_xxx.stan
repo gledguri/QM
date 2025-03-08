@@ -17,10 +17,6 @@ parameters {
 	real<upper=0> gamma_1;
 }
 transformed parameters{
-	vector[N_st_q] theta_st;
-	vector[N_st_qp] mu_st;
-	vector[N_st_qp] sigma_st;
-	//
 	vector[N_st_q] p_tmp_st = exp(S_q) * -inv_logit(logit_phi);
   vector[N_st_q] theta_st = log1m_exp(p_tmp_st) - p_tmp_st;
 	vector[N_st_qp] mu_st = beta_0[plate_st_idx] + (beta_1 * S_q_p);
