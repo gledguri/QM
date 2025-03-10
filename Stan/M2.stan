@@ -39,7 +39,7 @@ transformed parameters{
 	vector[N_st_qp] sigma_st = exp(gamma_0+(gamma_1 * S_q_p));
 	// 
 	vector[N_en_q] p_tmp_en = exp(C_q[j_qen_idx]) * -inv_logit(logit_phi);
-  vector[N_en_q] theta_st = log1m_exp(p_tmp_en) - p_tmp_en;
+  vector[N_en_q] theta_un = log1m_exp(p_tmp_en) - p_tmp_en;
 	vector[N_en_qp] mu_en = beta_0[plate_en_idx] + (beta_1 * C_q[j_qen_p_idx]);
 	vector[N_en_qp] sigma_en = exp(gamma_0+(gamma_1 * C_q[j_qen_p_idx]));
 }
