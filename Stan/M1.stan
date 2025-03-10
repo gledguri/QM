@@ -1,13 +1,13 @@
 data {
 	int N_st_q; // Total number of observation in qPCR standard samples
-	int N_st_qp; // Total number of observation in qPCR standard samples for only detected samples
+	int N_st_qp; // Total number of observation in qPCR standard samples for positive qPCR reaction (Z = 1)
   int N_plate; // Total number of plates used
   //
   array[N_st_qp] int plate_st_idx; // Plate index
-	array[N_st_q] int Z_qst; // Presence/Absence response of qPCR standard data
-	vector[N_st_qp] R_qst; // Ct values of qPCR standard data for only detected samples
-	vector[N_st_q] S_q; // Known concentration (log10) in qPCR data
-	vector[N_st_qp] S_q_p; // Known concentration (log10) in qPCR data for only detected samples
+	array[N_st_q] int Z_qst; // qPCR reaction (yes = 1 | no = 0)
+	vector[N_st_qp] R_qst; // Ct values of qPCR standard data only for positive qPCR reaction (Z = 1)
+	vector[N_st_q] S_q; // Known concentration (ln) in qPCR data
+	vector[N_st_qp] S_q_p; // Known concentration (ln) in qPCR data for only detected samples
 }
 parameters {
 	real logit_phi;
@@ -25,8 +25,8 @@ transformed parameters{
 model {
 	Z_qst ~ bernoulli_logit(theta_st);;
 	R_qst ~ normal(mu_st,sigma_st);
+  // Priors
 	logit_phi ~ normal(3,1);
-  // // // Continious model
 	beta_0 ~ normal(40, 1);
 	beta_1 ~ normal(-3, 1);
 	gamma_0 ~ normal(1, 0.1);
