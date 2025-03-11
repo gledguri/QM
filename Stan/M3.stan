@@ -5,7 +5,7 @@ data {
   //
   // Data
   vector[N_sp_i_MC2] alr_M5; // Additive log(e)-ratio of initial concentration of mock community
-  int Y_M5[N_sp_i_MC2,N_obs_Y_M5]; // Sequence reads of mock community samples
+  array[N_sp_i_MC2, N_obs_Y_M5] int Y_M5; // Sequence reads of mock community samples
   int NPCR;  // Number of PCR reactions
   //
   // Parameters
