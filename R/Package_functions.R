@@ -1,12 +1,13 @@
 # General functions ---------------------------------------------------------------------------
-.onLoad <- function(libname, pkgname) {
-	if (!requireNamespace("rstan", quietly = TRUE)) {
-		stop("The 'rstan' package is required but not installed.")
-	}
-	if (!requireNamespace("StanHeaders", quietly = TRUE)) {
-		stop("The 'StanHeaders' package is required but not installed.")
-	}
+load_QM_packages <- function(){
+	library(rstan);options(mc.cores = parallel::detectCores())
+	library(dplyr)
+	library(ggplot2)
+	library(tibble)
+	library("devtools")
+	devtools::install_github("BlakeRMills/MoMAColors");library(MoMAColors)
 }
+
 #' Display Example Data Structures for Models M1-M4
 #'
 #' This function prints example data frame structures showing the required format
