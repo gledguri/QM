@@ -3,6 +3,7 @@ load_QM_packages <- function(){
 	library(rstan);options(mc.cores = parallel::detectCores())
 	library(dplyr)
 	library(ggplot2)
+	library(stringr)
 	library(tibble)
 	library("devtools")
 	devtools::install_github("BlakeRMills/MoMAColors");library(MoMAColors)
@@ -954,7 +955,9 @@ plot_qpcr_cont_mod <- function(model_output,xmin_log,xmax_log){
 							ss_param %>% filter(grepl('beta_0',parameter)) %>%
 								mutate(Plate_name=str_split_fixed(parameter,'\\[', 3)[,2]) %>%
 								mutate(Plate_name = str_split_fixed(Plate_name,'\\]', 3)[,1]) %>%
-								left_join(.,stan_data$label_qpcr_plate,by='Plate_name') %>%
+								mutate(Plate_name=as.character(Plate_name)) %>%
+								left_join(.,stan_data$label_qpcr_plate %>%
+														mutate(Plate_name=as.character(Plate_name)),by='Plate_name') %>%
 								# mutate(plate_idx = as.numeric(str_extract(plate_idx, "\\d+"))) %>%
 								select(mean,Plate_name,Plate_index) %>% rename(beta_0='mean'),
 							by=c('plate_idx'='Plate_index')) %>%
