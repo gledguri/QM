@@ -1,7 +1,11 @@
 # General functions ---------------------------------------------------------------------------
 .onLoad <- function(libname, pkgname) {
-  requireNamespace("rstan", quietly = TRUE)
-  requireNamespace("StanHeaders", quietly = TRUE)
+	if (!requireNamespace("rstan", quietly = TRUE)) {
+		stop("The 'rstan' package is required but not installed.")
+	}
+	if (!requireNamespace("StanHeaders", quietly = TRUE)) {
+		stop("The 'StanHeaders' package is required but not installed.")
+	}
 }
 #' Display Example Data Structures for Models M1-M4
 #'
