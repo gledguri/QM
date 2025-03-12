@@ -15,6 +15,7 @@ Imports:
     tibble,
     tidyr,
     stringr,
+    StanHeaders,
     rstan,
     ggplot2,
     tibble
