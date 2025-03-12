@@ -17,6 +17,8 @@ Imports:
     tidyr,
     stringr,
     ggplot2,
+    vctrs,
+    cli,
     tibble,
     devtools,
     Rcpp (>= 0.12.0),
