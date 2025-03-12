@@ -1,4 +1,8 @@
 # General functions ---------------------------------------------------------------------------
+.onLoad <- function(libname, pkgname) {
+  requireNamespace("rstan", quietly = TRUE)
+  requireNamespace("StanHeaders", quietly = TRUE)
+}
 #' Display Example Data Structures for Models M1-M4
 #'
 #' This function prints example data frame structures showing the required format
