@@ -4,13 +4,16 @@
 \alias{prep_stan_M2}
 \title{Prepare data for Stan Model 2}
 \usage{
-prep_stan_M2(data, sample_type, Ct, sample_name_column, standard_concentration)
+prep_stan_M2(
+  qpcr_data,
+  sample_type,
+  Ct,
+  sample_name_column,
+  standard_concentration,
+  plate_index
+)
 }
 \arguments{
-\item{data}{A `data.frame` containing the qPCR data. It should include the
-Ct values, sample types (e.g., "STANDARD", "UNKNOWN"), sample names, and
-standard (initial) concentrations.}
-
 \item{sample_type}{A `character` string specifying the name of the column in `data`
 that indicates the type of sample (e.g., "STANDARD" for standard samples
 and "UNKNOWN" for environmental samples).}
@@ -25,6 +28,10 @@ in `data` that contains the unique sample names or identifiers (index).}
 \item{standard_concentration}{A `character` string specifying the name of the
 column in `data` that contains the standard concentrations for the standard samples.
 This column should be numeric and have NA values for environmental samples. If not it will be converted to numeric within the function.}
+
+\item{data}{A `data.frame` containing the qPCR data. It should include the
+Ct values, sample types (e.g., "STANDARD", "UNKNOWN"), sample names, and
+standard (initial) concentrations.}
 }
 \value{
 A list formatted as required by the Stan model.
@@ -33,11 +40,4 @@ A list formatted as required by the Stan model.
 This function prepares the data required to run Stan Model 2 by filtering
 the input data, selecting the necessary columns, and formatting the data
 to include both standard and unknown (environmental) qPCR samples.
-}
-\examples{
-stan_data_M2 <- prep_stan_M2(data = qpcr,
-                             sample_type = "task",
-                             Ct = "Ct",
-                             sample_name_column = "sample_name",
-                             standard_concentration = "standard_concentrations")
 }

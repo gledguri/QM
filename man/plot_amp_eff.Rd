@@ -4,7 +4,7 @@
 \alias{plot_amp_eff}
 \title{Plot Amplification Efficiencies}
 \usage{
-plot_amp_eff(amp_eff_output)
+plot_amp_eff(model_output)
 }
 \arguments{
 \item{amp_eff_output}{A data frame containing amplification efficiency data extracted from the model.}

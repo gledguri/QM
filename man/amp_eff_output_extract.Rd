@@ -4,7 +4,7 @@
 \alias{amp_eff_output_extract}
 \title{Extract amplification efficiencies from Stan Model 3}
 \usage{
-amp_eff_output_extract(stan_data, amp_eff_param)
+amp_eff_output_extract(model_output)
 }
 \arguments{
 \item{stan_data}{A `list` of data formatted as required by Stan Model 3, typically

@@ -4,17 +4,21 @@
 \alias{prep_stan_M1}
 \title{Prepare data for Stan Model 1}
 \usage{
-prep_stan_M1(data, Ct, standard_concentration)
+prep_stan_M1(qpcr_data, Ct, standard_concentration, plate_index)
 }
 \arguments{
-\item{data}{A `data.frame` containing the qPCR data. It should include the
+\item{qpcr_data}{A `data.frame` containing the qPCR data. It should include the
 Ct values and standard (initial) concentrations.}
 
-\item{Ct}{A `character` string specifying the name of the column in `data`
+\item{Ct}{A `character` string specifying the name of the column in `qpcr_data`
 that contains the Ct values. qPCR non-detects should be defined as 'Undetermined' and not NA or any other value}
 
 \item{standard_concentration}{A `character` string specifying the name of the
-column in `data` that contains the standard concentrations.}
+column in `qpcr_data` that contains the standard concentrations.}
+
+\item{plate_index}{A `character` string specifying the name of the
+column in `qpcr_data` that contains the plates each sample was run (if all were run in 1 plate then
+create a column that all values are 1.}
 }
 \value{
 A list formatted as required by the Stan model.
@@ -24,7 +28,9 @@ This function prepares the data required to run Stan Model 1 by filtering
 the input data and selecting the necessary columns.
 }
 \examples{
-stan_data_M1 <- prep_stan_M1(data = qpcr \%>\% filter(task == "STANDARD"),
+stan_data_M1 <- prep_stan_M1(qpcr_data = qpcr \%>\% filter(Sample_type=="STANDARD"),
                              Ct = "Ct",
-                             standard_concentration = "st_conc")
+                             standard_concentration = "st_concentration",
+                             plate_index = 'Plate')
+                             prep_stan_M1 <- function(qpcr_data, Ct, standard_concentration,plate_index)
 }

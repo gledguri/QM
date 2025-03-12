@@ -2,7 +2,7 @@
 % Please edit documentation in R/Package_functions.R
 \name{inverselogit}
 \alias{inverselogit}
-\title{Inverse Logit Transformation}
+\title{Inverse Logit transformation}
 \usage{
 inverselogit(x)
 }

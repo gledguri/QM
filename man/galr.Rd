@@ -2,7 +2,7 @@
 % Please edit documentation in R/Package_functions.R
 \name{galr}
 \alias{galr}
-\title{Compute Gled's Additive Log-Ratios}
+\title{Compute Additive Log-Ratios}
 \usage{
 galr(x, log = "e")
 }

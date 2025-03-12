@@ -2,26 +2,19 @@
 % Please edit documentation in R/Package_functions.R
 \name{prep_stan_M3}
 \alias{prep_stan_M3}
-\title{Prepare Data for Stan Model 3}
+\title{Extract Amplification Efficiency Parameters}
 \usage{
 prep_stan_M3(
-  data,
-  mock_species_names,
+  metabarcoding_data,
   mock_sequencing_columns,
   mock_initial_concentration,
   species_index,
+  species_names,
   number_of_PCR = 40,
-  tau_mu = 1000,
-  tau_sd = 10000
+  alpha_magnitude = 0.01
 )
 }
 \arguments{
-\item{data}{A `data.frame` containing the mock community data, including columns for
-sequencing counts, initial concentrations, species indices, and species names. See more in 'data_example(data = M3)'.}
-
-\item{mock_species_names}{A `character` string specifying the name of the column(s) in `data`
-that contains the species names in the mock community.}
-
 \item{mock_sequencing_columns}{A `character` string or a `vector` of characters specifying the
 columns in `data` that contain the sequencing counts for the mock community species.}
 
@@ -35,6 +28,14 @@ that contains the indices or identifiers for the species in the mock community.}
 \item{number_of_PCR}{A `numeric` value specifying the number of PCR cycles conducted during the experiment.
 Defaults to `40`.}
 
+\item{stanMod}{A `stanfit` object containing the results of the model fitting.}
+
+\item{data}{A `data.frame` containing the mock community data, including columns for
+sequencing counts, initial concentrations, species indices, and species names. See more in 'data_example(data = M3)'.}
+
+\item{mock_species_names}{A `character` string specifying the name of the column(s) in `data`
+that contains the species names in the mock community.}
+
 \item{tau_mu}{A numeric value specifying the mean of the prior distribution for the
 error term (η) in the model. Defaults to `1000`. It is recommended to keep `tau_mu` and `tau_sd` in a 1:10 ratio, but you may adjust these values as needed.}
 
@@ -42,21 +43,28 @@ error term (η) in the model. Defaults to `1000`. It is recommended to keep `tau
 for the error term (η) in the model. Defaults to `10000`.}
 }
 \value{
+A data frame containing the summary statistics of the amplification efficiency parameters.
+
 A list formatted as required by Stan Model 3, ready for input into the model.
 The computations in this model run in natural log space (ln).
 }
 \description{
+This function extracts amplification efficiency parameters from a fitted Stan model.
+}
+\examples{
+# Extract amplification efficiency parameters
+amp_eff_param <- extract_amp_efficiecy(stanMod)
+Prepare Data for Stan Model 3
+
 This function prepares the data required to run Stan Model 3 by selecting and formatting
 the necessary columns. Model 3 (M3) uses ONLY mock community sequencing data and their initial
 concentrations to estimate the amplification efficiency (α) relative to a reference species.
-}
-\examples{
+
 stan_data_M3 <- prep_stan_M3(data = mock_data,
                              mock_species_names = "species_names",
                              mock_sequencing_columns = c("mock_samp_1", "mock_samp_2", "mock_samp_3"),
                              mock_initial_concentration = "initial_concentration",
                              species_index = "species_index",
                              number_of_PCR = 40,
-                             tau_mu = 1000,
-                             tau_sd = 10000)
+                             alpha_magnitude = 0.01)
 }

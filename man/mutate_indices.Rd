@@ -4,7 +4,7 @@
 \alias{mutate_indices}
 \title{Group and Add Index to a Data Frame}
 \usage{
-mutate_indices(data, index_column)
+mutate_indices(data, index_variable, index_name)
 }
 \arguments{
 \item{data}{A data frame to be processed.}
@@ -20,5 +20,5 @@ This function groups a data frame by a specified column and adds an index to eac
 \examples{
 # Example usage
 df <- data.frame(group = c("A", "A", "B", "B", "C"), value = 1:5)
-mutate_indices(df, "group")
+df \%>\% mutate_indices('group', 'i_idx')
 }
