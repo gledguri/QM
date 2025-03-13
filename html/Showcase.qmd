@@ -83,7 +83,7 @@ data(metabarcoding);force(metabarcoding)
 ```
 
 ```{r, include=FALSE, warning=FALSE, message=FALSE}
-options(width = 1300) #wd
+options(width = 1300) #wd 
 ```
 
 ```{r}
@@ -99,101 +99,92 @@ Here we make use of the standard concentration to learn the parameters that link
 
 $$
 \begin{aligned}
-&\text{qPCR probability of detection model}\\
+&\textbf{qPCR probability of detection model}\\
 Z_{ij} &\sim \text{Bernoulli}(\theta_{i}) && \text{(1.1)} \\
 \theta_{i} &= 1 - exp(-W_{i} \cdot \phi) && \text{(1.2)} \\
-&\text{qPCR continuous model}\\
+&\text{}\\
+&\textbf{qPCR continuous model}\\
 Y_{ij} &\sim \text{Normal}(\mu_{i}, \sigma_{i}) && \text{(2.1)} \\
 \mu_{i} &= \beta0_{p} + \beta1 \cdot ln(C_{i}) && \text{(2.2)} \\
 \sigma_{i} &= e^{(\gamma0 + \gamma1 \cdot ln(C_{i}))} && \text{(2.3)}
 \end{aligned}
-$$ {#eq-qpcr}
+$$
 
 
-<!-- ```{r} --> <!-- M1 <- load_model('M1') -->
+```{r, warning=FALSE, message=FALSE,results='hide'}
+M1 <- load_model('M1')
+```
 
-<!-- # Prepare the data for going into the model -->
 
-<!-- stan_data_M1 <- prep_stan_M1( -->
+```{r} 
+# Prepare the data for going into the model
 
-<!--    qpcr_data = qpcr %>% filter(Sample_type=="STANDARD"), -->
+stan_data_M1 <- prep_stan_M1(
+   qpcr_data = qpcr %>% filter(Sample_type=="STANDARD"),
+   Ct = "Ct",
+   standard_concentration = "Std_concentration",
+   plate_index = 'Plate')
 
-<!--    Ct = "Ct", -->
+# Run the model
+M1_output <- Run_Model(stan_object = M1, stan_data = stan_data_M1)
+```
 
-<!--    standard_concentration = "Std_concentration", -->
+### Plot outputs of Model 1
 
-<!--    plate_index = 'Plate') -->
+```{r, fig.width=8, fig.height=5}
+extract_qpcr_param(M1_output) %>% as.tibble()
+plot_qpcr_prob_det(M1_output)
+plot_qpcr_cont_mod(M1_output)
+```
 
-<!-- # Run the model -->
+```{r, fig.width=17, fig.height=6}
+plot_qpcr_curves(M1_output)
+```
 
-<!-- M1_output <- Run_Model(stan_object = M1, stan_data = stan_data_M1) -->
+```{r, fig.width=15, fig.height=9}
+plot_qpcr_cont_mod_plate_specific(M1_output)
+```
 
-<!-- ``` -->
+### Run Model 2
 
-<!-- ### Plot outputs of Model 1 -->
+```{r, warning=FALSE, message=FALSE,results='hide'}
+M2 <- load_model('M2')
+```
 
-<!-- ```{r, fig.width=8, fig.height=5} -->
+```{r}
+# Prepare the data for going into the model
+stan_data_M2 <- prep_stan_M2(
+	qpcr_data = qpcr,
+	sample_type = "Sample_type",
+	Ct = "Ct",
+	sample_name_column = "Sample_name",
+	standard_concentration = "Std_concentration",
+	plate_index = 'Plate')
 
-<!-- extract_qpcr_param(M1_output) %>% as.tibble() -->
+# Run the model
+M2_output <- Run_Model(stan_object = M2, stan_data = stan_data_M2)
+```
 
-<!-- plot_qpcr_prob_det(M1_output) -->
+### Plot outputs of Model 2
 
-<!-- plot_qpcr_cont_mod(M1_output) -->
+```{r, fig.width=17, fig.height=6, warning=FALSE, message=FALSE}
+extract_qpcr_param(M2_output) %>% as_tibble()
+extract_est_conc(M2_output) %>% as_tibble()
+plot_qpcr_curves(M2_output)
+```
 
-<!-- ``` -->
+```{r, fig.width=10, fig.height=5, warning=FALSE, message=FALSE}
+plot_qpcr_prob_det(M2_output)
+plot_qpcr_cont_mod(M2_output)
+```
 
-<!-- ```{r, fig.width=17, fig.height=6} -->
+```{r, fig.width=17, fig.height=9, warning=FALSE, message=FALSE}
+plot_qpcr_cont_mod_plate_specific(M2_output)
+```
 
-<!-- plot_qpcr_curves(M1_output) -->
-
-<!-- ``` -->
-
-<!-- ```{r, fig.width=15, fig.height=9} -->
-
-<!-- plot_qpcr_cont_mod_plate_specific(M1_output) -->
-
-<!-- ``` -->
-
-<!-- ### Run Model 2 -->
-
-<!-- ```{r, warning=FALSE, message=FALSE,results='hide'} -->
-<!-- M2 <- load_model('M2') -->
-<!-- ``` -->
-
-<!-- ```{r} -->
-<!-- # Prepare the data for going into the model -->
-<!-- stan_data_M2 <- prep_stan_M2( -->
-<!-- 	qpcr_data = qpcr, -->
-<!-- 	sample_type = "Sample_type", -->
-<!-- 	Ct = "Ct", -->
-<!-- 	sample_name_column = "Sample_name", -->
-<!-- 	standard_concentration = "Std_concentration", -->
-<!-- 	plate_index = 'Plate') -->
-
-<!-- # Run the model -->
-<!-- M2_output <- Run_Model(stan_object = M2, stan_data = stan_data_M2) -->
-<!-- ``` -->
-
-<!-- ### Plot outputs of Model 2 -->
-
-<!-- ```{r, fig.width=17, fig.height=6, warning=FALSE, message=FALSE} -->
-<!-- extract_qpcr_param(M2_output) %>% as_tibble() -->
-<!-- extract_est_conc(M2_output) %>% as_tibble() -->
-<!-- plot_qpcr_curves(M2_output) -->
-<!-- ``` -->
-
-<!-- ```{r, fig.width=10, fig.height=5, warning=FALSE, message=FALSE} -->
-<!-- plot_qpcr_prob_det(M2_output) -->
-<!-- plot_qpcr_cont_mod(M2_output) -->
-<!-- ``` -->
-
-<!-- ```{r, fig.width=17, fig.height=9, warning=FALSE, message=FALSE} -->
-<!-- plot_qpcr_cont_mod_plate_specific(M2_output) -->
-<!-- ``` -->
-
-<!-- ```{r, fig.width=17, fig.height=8, warning=FALSE, message=FALSE} -->
-<!-- plot_est_conc(M2_output) -->
-<!-- ``` -->
+```{r, fig.width=17, fig.height=8, warning=FALSE, message=FALSE}
+plot_est_conc(M2_output)
+```
 
 
 ### Run Model 3
@@ -215,16 +206,125 @@ stan_data_M3 <- prep_stan_M3(
 	species_names = 'Species',
 	number_of_PCR = 43,
 	alpha_magnitude = 0.1)
-str(stan_data_M3)
 
 # Run the model
 M3_output <- Run_Model(stan_object = M3, stan_data = stan_data_M3)
 ```
 
-### Plot outputs of Model 2
+### Plot outputs of Model 3
 
-```{r, fig.width=17, fig.height=10}
-# extract_amp_efficiecy(M3_output)
-# amp_eff_output_extract(M3_output)
-# plot_amp_eff(M3_output)
+```{r, fig.width=17, fig.height=7}
+extract_amp_efficiecy(M3_output)
+amp_eff_output_extract(M3_output)
+plot_amp_eff(M3_output)
+```
+
+### Run Model 4
+
+```{r, warning=FALSE, message=FALSE,results='hide'}
+M4 <- load_model('M4')
+```
+
+```{r}
+# Get column names for mock samples and environmental samples
+mock_columns <- metabarcoding %>% select(Mock_1:Mock_6) %>% names()
+sample_columns <- metabarcoding %>% select(-all_of(mock_columns),-Species,-sp_idx,-ini_conc) %>% names()
+
+# Prepare the data for going into the model
+stan_data_M4 <- prep_stan_M4(
+	metabarcoding_data = metabarcoding,
+	mock_sequencing_columns = mock_columns,
+	sample_sequencing_columns = sample_columns,
+	mock_initial_concentration = 'ini_conc',
+	species_index = 'sp_idx',
+	species_names = 'Species',
+	number_of_PCR = 43,
+	alpha_magnitude = 0.1)
+
+M4_output <- Run_Model(stan_object = M4, stan_data = stan_data_M4)
+```
+
+### Plot outputs of Model 4
+
+```{r, fig.width=17, fig.height=7}
+extract_amp_efficiecy(M4_output)
+amp_eff_output_extract(M4_output)
+plot_amp_eff(M4_output)
+```
+
+```{r, include=FALSE, warning=FALSE, message=FALSE}
+options(width = 1300) #wd
+```
+
+```{r, fig.width=17, fig.height=7}
+extract_ini_prop(M4_output)
+```
+
+```{r, include=FALSE, warning=FALSE, message=FALSE}
+options(width = 300) #wd
+```
+
+```{r, fig.width=17, fig.height=7}
+bar_plot_est_ini_prop(M4_output)
+heatmap_plot_est_ini_prop(M4_output)
+```
+
+### Run Model 5
+
+```{r, warning=FALSE, message=FALSE,results='hide'}
+M5 <- load_model('M5')
+```
+
+```{r,warning=FALSE, message=FALSE,results='hide'}
+mock_columns <- metabarcoding %>% select(Mock_1:Mock_6) %>% names()
+sample_columns <- metabarcoding %>% select(-all_of(mock_columns),-Species,-sp_idx,-ini_conc) %>% names()
+
+qpcr <- qpcr %>% filter(qpcr$Sample_name%in%sample_columns|qpcr$Sample_type=='STANDARD')
+
+stan_data_M5 <- prep_stan_M5(
+	qpcr_data = qpcr,
+	sample_type = "Sample_type",
+	Ct = "Ct",
+	sample_name_column = "Sample_name",
+	standard_concentration = "Std_concentration",
+	plate_index = 'Plate',
+	metabarcoding_data = metabarcoding,
+	mock_sequencing_columns = mock_columns,
+	sample_sequencing_columns = sample_columns,
+	mock_initial_concentration = 'ini_conc',
+	species_index = 'sp_idx',
+	species_names = 'Species',
+	number_of_PCR = 43,
+	alpha_magnitude = 0.1)
+
+M5_output <- Run_Model(stan_object = M5, stan_data = stan_data_M5,
+											 treedepth = 12,iterations = 2000,warmup = 1000)
+```
+
+### Plot outputs of Model 5
+
+```{r, fig.width=17, fig.height=7}
+extract_amp_efficiecy(M5_output)
+amp_eff_output_extract(M5_output)
+plot_amp_eff(M5_output)
+```
+
+```{r, include=FALSE, warning=FALSE, message=FALSE}
+options(width = 1300) #wd
+```
+
+```{r, fig.width=17, fig.height=7}
+extract_ini_prop(M5_output)
+```
+
+```{r, include=FALSE, warning=FALSE, message=FALSE}
+options(width = 300) #wd
+```
+
+
+```{r, fig.width=17, fig.height=7}
+bar_plot_est_ini_prop(M5_output)
+bar_plot_est_ini_prop(M4_output)
+heatmap_plot_est_ini_prop(M5_output)
+plot_est_ini_conc(M5_output)
 ```
