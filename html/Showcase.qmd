@@ -11,21 +11,18 @@ format:
     self-contained: true 
     collapsible: true
     collapse-level: 1
-    # code-summary: "Show/Hide Code"  # Toggle text for code folding
-    # css: 'style_gg.css'
     grid:
       sidebar-width: 200px
-      body-width: 750px
+      body-width: 880px
       margin-width: 200px
       gutter-width: 1.5rem
 author: Gled Guri
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-editor: visual
+editor: source
 editor_options: 
   chunk_output_type: console
 ---
 
-```{=html}
 <style>
 body {
   font-family: Arial, sans-serif;
@@ -34,7 +31,7 @@ body {
 
 h1 {
   font-size: 22px;  /* Adjust the size of H1 headers */
-  font-weight: normal;  /* Make H1 headers not bold */
+  font-weight: bold;  /* Make H1 headers not bold */
 }
 
 h2 {
@@ -52,7 +49,6 @@ h4 {
   font-weight: normal;  /* Make H4 headers not bold */
 }
 </style>
-```
 
 ```{r, include=FALSE}
 dwidth <- 150
@@ -67,7 +63,7 @@ options(width = 300) #wd
 options(width = dwidth)#wd
 ```
 
-### Load the package and its dependencies
+Load the package and its dependencies
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
 devtools::install_github("gledguri/QM",dependencies = TRUE, force = T )
@@ -75,9 +71,10 @@ library(QM)
 load_QM_packages()
 ```
 
-### Load the data
+Load the data
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
+# data(herring_qpcr);force(herring_qpcr)
 data(cod_qpcr);force(cod_qpcr)
 data(metabarcoding);force(metabarcoding)
 ```
@@ -87,15 +84,17 @@ options(width = 1300) #wd
 ```
 
 ```{r}
-qpcr
+cod_qpcr
 metabarcoding
 ```
+
 ```{r, include=FALSE, warning=FALSE, message=FALSE}
 options(width = 300) #wd
 ```
-### Run Model 1
 
-Here we make use of the standard concentration to learn the parameters that link the known DNA concentration with observed Ct values (Y) and positive / negative qPCR amplification (Z)
+# Model 1
+
+Here we make use of the standard concentration to learn the parameters that link the known DNA concentration (C) with observed Ct values (Y) and positive / negative qPCR amplification (Z). For detailed explanation please read [Guri et al., 2024](https://onlinelibrary.wiley.com/doi/full/10.1002/ece3.70678). 
 
 $$
 \begin{aligned}
@@ -110,22 +109,29 @@ Y_{ij} &\sim \text{Normal}(\mu_{i}, \sigma_{i}) && \text{(2.1)} \\
 \end{aligned}
 $$
 
-
 ```{r, warning=FALSE, message=FALSE,results='hide'}
 M1 <- load_model('M1')
 ```
 
+## Prepare the data to be loaded in the model.
 
-```{r} 
-# Prepare the data for going into the model
+The data should be formated in a particular form distinguishing the different samples and their information. Please use `data_example('M1')` to see the data format for required for Model 1 or use `data(cod_qpcr)` to load the data from [Guri et al., 2024](https://onlinelibrary.wiley.com/doi/full/10.1002/ece3.70678) that are used in this script. 
 
+
+```{r}
 stan_data_M1 <- prep_stan_M1(
-   qpcr_data = qpcr %>% filter(Sample_type=="STANDARD"),
+   qpcr_data = cod_qpcr %>% filter(Sample_type=="STANDARD"),
    Ct = "Ct",
    standard_concentration = "Std_concentration",
    plate_index = 'Plate')
+```
 
-# Run the model
+## Run the model.
+
+This chunk runs the Bayesian model (eq. 1.1 - 2.3) where C is the known DNA concentration from the Standard samples, Y is the observed Ct values form the qPCR machine and Z (Z = 1 for positive amplification & Z = 0 for non amplification hence Ct == 'Undetermined')
+
+
+```{r}
 M1_output <- Run_Model(stan_object = M1, stan_data = stan_data_M1)
 ```
 
@@ -154,7 +160,7 @@ M2 <- load_model('M2')
 ```{r}
 # Prepare the data for going into the model
 stan_data_M2 <- prep_stan_M2(
-	qpcr_data = qpcr,
+	qpcr_data = cod_qpcr,
 	sample_type = "Sample_type",
 	Ct = "Ct",
 	sample_name_column = "Sample_name",
@@ -185,7 +191,6 @@ plot_qpcr_cont_mod_plate_specific(M2_output)
 ```{r, fig.width=17, fig.height=8, warning=FALSE, message=FALSE}
 plot_est_conc(M2_output)
 ```
-
 
 ### Run Model 3
 
@@ -279,10 +284,10 @@ M5 <- load_model('M5')
 mock_columns <- metabarcoding %>% select(Mock_1:Mock_6) %>% names()
 sample_columns <- metabarcoding %>% select(-all_of(mock_columns),-Species,-sp_idx,-ini_conc) %>% names()
 
-qpcr <- qpcr %>% filter(qpcr$Sample_name%in%sample_columns|qpcr$Sample_type=='STANDARD')
+# qpcr <- qpcr %>% filter(qpcr$Sample_name%in%sample_columns|qpcr$Sample_type=='STANDARD')
 
 stan_data_M5 <- prep_stan_M5(
-	qpcr_data = qpcr,
+	qpcr_data = cod_qpcr,
 	sample_type = "Sample_type",
 	Ct = "Ct",
 	sample_name_column = "Sample_name",
@@ -321,10 +326,8 @@ extract_ini_prop(M5_output)
 options(width = 300) #wd
 ```
 
-
 ```{r, fig.width=17, fig.height=7}
 bar_plot_est_ini_prop(M5_output)
-bar_plot_est_ini_prop(M4_output)
 heatmap_plot_est_ini_prop(M5_output)
 plot_est_ini_conc(M5_output)
 ```
