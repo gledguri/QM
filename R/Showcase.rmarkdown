@@ -25,20 +25,32 @@ editor_options:
   chunk_output_type: console
 ---
 
+
+
 ### Load the package and its dependencies
+
+
 ```{R, error=FALSE, message=FALSE, results=FALSE}
 devtools::install_github("gledguri/QM",dependencies = TRUE, force = T );library(QM)
 load_QM_packages()
 ```
 
+
+
 ### Load the data
+
+
 ```{R}
 data(qpcr);force(qpcr)
 data(metabarcoding);force(metabarcoding)
 ```
 
 
+
+
 ### Run Model 1
+
+
 ```{R}
 M1 <- load_model('M1')
 
@@ -53,12 +65,15 @@ stan_data_M1 <- prep_stan_M1(
 M1_output <- Run_Model(stan_object = M1, stan_data = stan_data_M1)
 ```
 
-
 ```{R}
 # diagnose_model(M1_output)
 ```
 
+
+
 ### Plot outputs of Model 1
+
+
 ```{R}
 #| fig-width: 800
 extract_qpcr_param(M1_output)
@@ -69,7 +84,11 @@ plot_qpcr_cont_mod_plate_specific(M1_output)
 ```
 
 
+
+
 ### Run Model 2
+
+
 ```{R}
 M2 <- load_model('M2')
 
@@ -86,12 +105,15 @@ stan_data_M2 <- prep_stan_M2(
 M2_output <- Run_Model(stan_object = M2, stan_data = stan_data_M2)
 ```
 
-
 ```{R}
 # diagnose_model(M2_output)
 ```
 
+
+
 ### Plot outputs of Model 2
+
+
 ```{R}
 #| fig-width: 800
 extract_est_conc(M2_output)
@@ -102,7 +124,11 @@ plot_qpcr_cont_mod_plate_specific(M2_output)
 plot_est_conc(M2_output)
 ```
 
+
+
 ### Run Model 3
+
+
 ```{R}
 M3 <- load_model('M3')
 
@@ -124,19 +150,26 @@ stan_data_M3 <- prep_stan_M3(
 M3_output <- Run_Model(stan_object = M3, stan_data = stan_data_M3)
 ```
 
-
 ```{R}
 # diagnose_model(M3_output)
 ```
 
+
+
 ### Plot outputs of Model 3
+
+
 ```{R}
 extract_amp_efficiecy(M3_output)
 amp_eff_output_extract(M3_output)
 plot_amp_eff(M3_output)
 ```
 
+
+
 ### Run Model 4
+
+
 ```{R}
 M4 <- load_model('M4')
 
@@ -158,12 +191,15 @@ stan_data_M4 <- prep_stan_M4(
 M4_output <- Run_Model(stan_object = M4, stan_data = stan_data_M4)
 ```
 
-
 ```{R}
 # diagnose_model(M4_output)
 ```
 
+
+
 ### Plot outputs of Model 4
+
+
 ```{R}
 extract_amp_efficiecy(M4_output)
 amp_eff_output_extract(M4_output)
@@ -172,7 +208,6 @@ extract_ini_prop(M4_output)
 bar_plot_est_ini_prop(M4_output)
 heatmap_plot_est_ini_prop(M4_output)
 ```
-
 
 ```{R}
 M5 <- load_model('M5')
@@ -201,12 +236,15 @@ M5_output <- Run_Model(stan_object = M5, stan_data = stan_data_M5,
 											 treedepth = 12,iterations = 2000,warmup = 1000)
 ```
 
-
 ```{R}
 # diagnose_model(M5_output)
 ```
 
+
+
 ### Plot outputs of Model 5
+
+
 ```{R}
 extract_amp_efficiecy(M5_output)
 amp_eff_output_extract(M5_output)
