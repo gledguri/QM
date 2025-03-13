@@ -882,10 +882,26 @@ plot_qpcr_curves <- function(model_output,xmin_log,xmax_log){
 plot_qpcr_prob_det <- function(model_output,xmin_log,xmax_log){
 	stan_data <- model_output[[1]]
 	stanMod <- model_output[[2]]
+	
 	ss_param <- extract_qpcr_param(model_output)
 	if(missing(xmin_log)) xmin_log <- floor(min(stan_data$S_q))
 	if(missing(xmax_log)) xmax_log <- round(max(stan_data$S_q))
-	samp_point <- cbind(stan_data$S_q,stan_data$Z_qst) %>% as.data.frame() %>% setNames(c("x","y"))
+	
+	standard_point <- cbind(stan_data$S_q,stan_data$Z_qst) %>% as.data.frame() %>% setNames(c("x","y"))
+	
+	if (!is.null(stan_data$Z_qen)){
+		samp_point <-
+			cbind(stan_data$Z_qen,stan_data$j_qen_idx) %>% as.data.frame() %>% setNames(c('Z','j_idx')) %>% 
+			left_join(.,
+								extract_param(stanMod,'C_q') %>% select(mean,`2.5%`, `97.5%`) %>% 
+									setNames(c('C_est','C_est_2.5%_CI','C_est_97.5%_CI')) %>% 
+									rownames_to_column('parameter') %>% 
+									mutate(j_idx=str_split_fixed(parameter,'\\[', 3)[,2]) %>%
+									mutate(j_idx = str_split_fixed(j_idx,'\\]', 3)[,1]) %>% 
+									mutate(j_idx=as.numeric(j_idx)) %>% 
+									select(-parameter),
+								by='j_idx')}
+	
 	line_df <- data.frame(x = seq(xmin_log, xmax_log, by = 0.1)) %>%
 		mutate(phi= ss_param$mean[1] %>% inverselogit()) %>%
 		mutate(phi_lo=ss_param$`2.5%`[1] %>% inverselogit()) %>%
@@ -893,11 +909,12 @@ plot_qpcr_prob_det <- function(model_output,xmin_log,xmax_log){
 		mutate(psi_pred=1-exp(exp(x)*phi*-1)) %>%
 		mutate(psi_pred_lo=1-exp(exp(x)*phi_lo*-1)) %>%
 		mutate(psi_pred_up=1-exp(exp(x)*phi_up*-1))
+	
 	pp <-
 		line_df %>%
 		ggplot()+
 		geom_line(aes(x=exp(x),y=psi_pred),lty=2)+
-		geom_jitter(data=samp_point,aes(x = exp(x),y=y),width = 0.09, height = 0.03,color="tomato2",alpha=0.6)+
+		geom_jitter(data=standard_point,aes(x = exp(x),y=y),width = 0.09, height = 0.03,color="black",alpha=0.6)+
 		labs(x='DNA concentration',y='Probability of detection')+
 		scale_x_log10(labels=scientific_10,
 									breaks=round_by10(c(exp(seq(xmin_log,xmax_log,length.out = 4)))),
@@ -905,8 +922,36 @@ plot_qpcr_prob_det <- function(model_output,xmin_log,xmax_log){
 		theme_bw()+
 		theme(axis.title = element_text(size=14),
 					axis.text = element_text(size=13))
-	return(pp)
+	
+	legend1 <- 
+		suppressWarnings(cowplot::get_legend(
+			ggplot(data.frame(x=c(1),y=c(1),sample=c("Standard")), aes(x, y, color = sample)) +
+				geom_point(size = 2) +
+				scale_color_manual(values = c("Standard" = "black"),name = "Sample") +
+				theme_bw()+
+				theme(legend.text = element_text(size=12),
+							legend.title = element_text(size=13))
+		))
+	p1 <- cowplot::plot_grid(pp,legend1,rel_widths = c(7,1))
+	
+	if (!is.null(stan_data$Z_qen)){
+		legend2 <- 
+			suppressWarnings(cowplot::get_legend(
+				ggplot(data.frame(x=c(1,1),y=c(1,1),sample=c("Standard", "Environmental")), aes(x, y, color = sample)) +
+					geom_point(size = 2) +
+					scale_color_manual(values = c("Standard" = "black", "Environmental" = "tomato2"),name = "Sample") +
+					theme_bw()+
+					theme(legend.text = element_text(size=12),
+								legend.title = element_text(size=13))
+			))
+		
+		pp <- pp+
+			geom_jitter(data=samp_point,aes(x = exp(C_est),y=Z),width = 0.09, height = 0.03,color="tomato2",alpha=0.6)
+		p1 <- cowplot::plot_grid(pp,legend2,rel_widths = c(7,1))
+	}
+	return(p1)
 }
+
 
 #' Plot Continuous Model (Ct Values)
 #'
@@ -932,17 +977,32 @@ plot_qpcr_prob_det <- function(model_output,xmin_log,xmax_log){
 plot_qpcr_cont_mod <- function(model_output,xmin_log,xmax_log){
 	stan_data <- model_output[[1]]
 	stanMod <- model_output[[2]]
-
+	
 	ss_param <- extract_qpcr_param(model_output)
-
+	
 	if(missing(xmin_log)) xmin_log <- floor(min(stan_data$S_q))
 	if(missing(xmax_log)) xmax_log <- round(max(stan_data$S_q))
-	samp_point <- cbind(stan_data$S_q_p,stan_data$R_qst,stan_data$plate_st_idx) %>%
+	standard_point <- cbind(stan_data$S_q_p,stan_data$R_qst,stan_data$plate_st_idx) %>%
 		as.data.frame() %>%
 		setNames(c("k_conc","obs_ct",'plate_idx')) %>%
 		left_join(.,
 							stan_data$label_qpcr_plate,
 							by=c('plate_idx'='Plate_index'))
+	
+	if (!is.null(stan_data$R_qen)){
+		samp_point <-
+			cbind(stan_data$R_qen,stan_data$j_qen_p_idx,stan_data$plate_en_idx) %>% as.data.frame() %>% setNames(c('Ct','j_idx','p_idx')) %>% 
+			left_join(.,
+								extract_param(stanMod,'C_q') %>% select(mean,`2.5%`, `97.5%`) %>% 
+									setNames(c('C_est','C_est_2.5%_CI','C_est_97.5%_CI')) %>% 
+									rownames_to_column('parameter') %>% 
+									mutate(j_idx=str_split_fixed(parameter,'\\[', 3)[,2]) %>%
+									mutate(j_idx = str_split_fixed(j_idx,'\\]', 3)[,1]) %>% 
+									mutate(j_idx=as.numeric(j_idx)) %>% 
+									select(-parameter),
+								by='j_idx') %>% 
+			left_join(.,stan_data$label_qpcr_plate,
+								by=c('p_idx'='Plate_index'))}
 	line_df <-
 		data.frame(x = rep(seq(xmin_log, xmax_log, by = 0.1),stan_data$N_plate),
 							 plate_idx=rep(c(1:stan_data$N_plate),
@@ -963,13 +1023,13 @@ plot_qpcr_cont_mod <- function(model_output,xmin_log,xmax_log){
 							by=c('plate_idx'='Plate_index')) %>%
 		mutate(pred_mu=beta_0+beta_1*x) %>%
 		mutate(pred_sigma=exp(gamma_0+(gamma_1 * x)))
-
+	
 	pp <- line_df %>% mutate(Plate_name=as.factor(Plate_name)) %>%
 		ggplot()+
 		geom_line(aes(x=exp(x),y=pred_mu,colour = Plate_name),alpha=0.4,lty=2)+
 		scale_color_manual(values=rep('black',stan_data$N_plate))+
-		geom_point(data=samp_point,aes(y=obs_ct,x=exp(k_conc),alpha=0.6),
-							 color='tomato2')+
+		geom_point(data=standard_point,aes(y=obs_ct,x=exp(k_conc),alpha=0.6),
+							 color='black')+
 		theme_bw()+
 		labs(x='DNA concentration',y='Ct')+
 		scale_x_log10(labels=scientific_10,
@@ -978,19 +1038,134 @@ plot_qpcr_cont_mod <- function(model_output,xmin_log,xmax_log){
 		theme(legend.position = 'none',
 					axis.title = element_text(size=14),
 					axis.text = element_text(size=13))
-	return(pp)
+	legend1 <- 
+		suppressWarnings(cowplot::get_legend(
+			ggplot(data.frame(x=c(1),y=c(1),sample=c("Standard")), aes(x, y, color = sample)) +
+				geom_point(size = 2) +
+				scale_color_manual(values = c("Standard" = "black"),name = "Sample") +
+				theme_bw()+
+				theme(legend.text = element_text(size=12),
+							legend.title = element_text(size=13))
+		))
+	p1 <- cowplot::plot_grid(pp,legend1,rel_widths = c(7,1))
+	
+	if (!is.null(stan_data$R_qen)){
+		legend2 <- 
+			suppressWarnings(cowplot::get_legend(
+				ggplot(data.frame(x=c(1,1),y=c(1,1),sample=c("Standard", "Environmental")), aes(x, y, color = sample)) +
+					geom_point(size = 2) +
+					scale_color_manual(values = c("Standard" = "black", "Environmental" = "tomato2"),name = "Sample") +
+					theme_bw()+
+					theme(legend.text = element_text(size=12),
+								legend.title = element_text(size=13))
+			))
+		
+		pp <- pp+
+			geom_jitter(data=samp_point,aes(x = exp(C_est),y=Ct),width = 0.09, height = 0.03,color="tomato2",alpha=0.6)
+		p1 <- cowplot::plot_grid(pp,legend2,rel_widths = c(7,1))
+	}
+	return(p1)
 }
 
 
-plot_qpcr_cont_mod_plate_specific <- function(model_output){
-	p1 <- plot_qpcr_cont_mod(model_output)
-
-	p2 <-
-		p1+
+plot_qpcr_cont_mod_plate_specific <- function(model_output,xmin_log,xmax_log){
+	stan_data <- model_output[[1]]
+	stanMod <- model_output[[2]]
+	
+	ss_param <- extract_qpcr_param(model_output)
+	
+	if(missing(xmin_log)) xmin_log <- floor(min(stan_data$S_q))
+	if(missing(xmax_log)) xmax_log <- round(max(stan_data$S_q))
+	standard_point <- cbind(stan_data$S_q_p,stan_data$R_qst,stan_data$plate_st_idx) %>%
+		as.data.frame() %>%
+		setNames(c("k_conc","obs_ct",'plate_idx')) %>%
+		left_join(.,
+							stan_data$label_qpcr_plate,
+							by=c('plate_idx'='Plate_index'))
+	
+	if (!is.null(stan_data$R_qen)){
+		samp_point <-
+			cbind(stan_data$R_qen,stan_data$j_qen_p_idx,stan_data$plate_en_idx) %>% as.data.frame() %>% setNames(c('Ct','j_idx','p_idx')) %>% 
+			left_join(.,
+								extract_param(stanMod,'C_q') %>% select(mean,`2.5%`, `97.5%`) %>% 
+									setNames(c('C_est','C_est_2.5%_CI','C_est_97.5%_CI')) %>% 
+									rownames_to_column('parameter') %>% 
+									mutate(j_idx=str_split_fixed(parameter,'\\[', 3)[,2]) %>%
+									mutate(j_idx = str_split_fixed(j_idx,'\\]', 3)[,1]) %>% 
+									mutate(j_idx=as.numeric(j_idx)) %>% 
+									select(-parameter),
+								by='j_idx') %>% 
+			left_join(.,stan_data$label_qpcr_plate,
+								by=c('p_idx'='Plate_index'))}
+	line_df <-
+		data.frame(x = rep(seq(xmin_log, xmax_log, by = 0.1),stan_data$N_plate),
+							 plate_idx=rep(c(1:stan_data$N_plate),
+							 							each=length(seq(xmin_log, xmax_log, by = 0.1)))) %>%
+		# left_join(.,stan_data$label_qpcr_plate,by=c('plate_idx'='Plate_index')) %>%
+		mutate(gamma_0=ss_param %>% filter(parameter=='gamma_0') %>% pull(mean)) %>%
+		mutate(gamma_1=ss_param %>% filter(parameter=='gamma_1') %>% pull(mean)) %>%
+		mutate(beta_1=ss_param %>% filter(parameter=='beta_1') %>% pull(mean)) %>%
+		left_join(.,
+							ss_param %>% filter(grepl('beta_0',parameter)) %>%
+								mutate(Plate_name=str_split_fixed(parameter,'\\[', 3)[,2]) %>%
+								mutate(Plate_name = str_split_fixed(Plate_name,'\\]', 3)[,1]) %>%
+								mutate(Plate_name=as.character(Plate_name)) %>%
+								left_join(.,stan_data$label_qpcr_plate %>%
+														mutate(Plate_name=as.character(Plate_name)),by='Plate_name') %>%
+								# mutate(plate_idx = as.numeric(str_extract(plate_idx, "\\d+"))) %>%
+								select(mean,Plate_name,Plate_index) %>% rename(beta_0='mean'),
+							by=c('plate_idx'='Plate_index')) %>%
+		mutate(pred_mu=beta_0+beta_1*x) %>%
+		mutate(pred_sigma=exp(gamma_0+(gamma_1 * x)))
+	
+	pp <- line_df %>% mutate(Plate_name=as.factor(Plate_name)) %>%
+		ggplot()+
+		geom_line(aes(x=exp(x),y=pred_mu,colour = Plate_name),alpha=0.4,lty=2)+
+		scale_color_manual(values=rep('black',stan_data$N_plate))+
+		geom_point(data=standard_point,aes(y=obs_ct,x=exp(k_conc),alpha=0.6),
+							 color='black')+
+		theme_bw()+
+		labs(x='DNA concentration',y='Ct')+
+		scale_x_log10(labels=scientific_10,
+									breaks=round_by10(c(exp(seq(xmin_log,xmax_log,length.out = 4)))),
+									lim=c(exp(xmin_log-0.1),exp(xmax_log+0.1)))+
 		facet_wrap(~Plate_name)+
 		geom_line(aes(x=exp(x),y=pred_mu+(pred_sigma^2),colour = Plate_name),alpha=0.4,lty=2)+
-		geom_line(aes(x=exp(x),y=pred_mu-(pred_sigma^2),colour = Plate_name),alpha=0.4,lty=2)
-	return(p2)
+		geom_line(aes(x=exp(x),y=pred_mu-(pred_sigma^2),colour = Plate_name),alpha=0.4,lty=2)+
+		theme(legend.position = 'none',
+					axis.title = element_text(size=14),
+					axis.text = element_text(size=13))
+	
+	legend1 <- 
+		suppressWarnings(cowplot::get_legend(
+			ggplot(data.frame(x=c(1),y=c(1),sample=c("Standard")), aes(x, y, color = sample)) +
+				geom_point(size = 2) +
+				scale_color_manual(values = c("Standard" = "black"),name = "Sample") +
+				theme_bw()+
+				theme(legend.text = element_text(size=12),
+							legend.title = element_text(size=13))
+		))
+	p1 <- cowplot::plot_grid(pp,legend1,rel_widths = c(7,1))
+	
+	if (!is.null(stan_data$R_qen)){
+		legend2 <- 
+			suppressWarnings(cowplot::get_legend(
+				ggplot(data.frame(x=c(1,1),y=c(1,1),sample=c("Standard", "Environmental")), aes(x, y, color = sample)) +
+					geom_point(size = 2) +
+					scale_color_manual(values = c("Standard" = "black", "Environmental" = "tomato2"),name = "Sample") +
+					theme_bw()+
+					theme(legend.text = element_text(size=12),
+								legend.title = element_text(size=13))
+			))
+		
+		pp <- pp+
+			geom_jitter(data=samp_point,aes(x = exp(C_est),y=Ct),width = 0.09, height = 0.03,color="tomato2",alpha=0.6)+
+			facet_wrap(~Plate_name)+
+			geom_line(aes(x=exp(x),y=pred_mu+(pred_sigma^2),colour = Plate_name),alpha=0.4,lty=2)+
+			geom_line(aes(x=exp(x),y=pred_mu-(pred_sigma^2),colour = Plate_name),alpha=0.4,lty=2)
+		p1 <- cowplot::plot_grid(pp,legend2,rel_widths = c(7,1))
+	}
+	return(p1)
 }
 
 # Model 2 functions ---------------------------------------------------------------------------
