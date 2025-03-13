@@ -1463,7 +1463,7 @@ prep_stan_M3 <- function(metabarcoding_data,
 	mock_sp_names <- metabarcoding_data %>%
 		select({{ species_names }})
 
-	ini_mock$prop <- galr(ini_mock[,1],log="e")
+	ini_mock$prop <- galr(ini_mock$i_c,log="e")
 
 	stan_data <- list(
 		############## Integers

@@ -3403,7 +3403,7 @@ Y_{ij} &amp;\sim \text{Normal}(\mu_{i}, \sigma_{i}) &amp;&amp; \text{(2.1)} \\
 <section id="run-model-3" class="level3" data-number="0.4">
 <h3 data-number="0.4" class="anchored" data-anchor-id="run-model-3"><span class="header-section-number">0.4</span> Run Model 3</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># M3 &lt;- load_model(&#39;M3&#39;)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>M3 <span class="ot">&lt;-</span> <span class="fu">load_model</span>(<span class="st">&#39;M3&#39;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Trim metabarcoding data only for mock samples</span></span>
@@ -3417,7 +3417,8 @@ Y_{ij} &amp;\sim \text{Normal}(\mu_{i}, \sigma_{i}) &amp;&amp; \text{(2.1)} \\
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">species_index =</span> <span class="st">&#39;sp_idx&#39;</span>,</span>
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">species_names =</span> <span class="st">&#39;Species&#39;</span>,</span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">number_of_PCR =</span> <span class="dv">43</span>,</span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha_magnitude =</span> <span class="fl">0.1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha_magnitude =</span> <span class="fl">0.1</span>)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(stan_data_M3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>List of 9
  $ N_sp_i_MC2       : int 10
@@ -3460,52 +3461,15 @@ Y_{ij} &amp;\sim \text{Normal}(\mu_{i}, \sigma_{i}) &amp;&amp; \text{(2.1)} \\
  $ species_idx      : tibble [10 × 1] (S3: tbl_df/tbl/data.frame)
   ..$ sp_idx: int [1:10] 1 2 3 4 5 6 7 8 9 10</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(stan_data_M3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run the model</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>M3_output <span class="ot">&lt;-</span> <span class="fu">Run_Model</span>(<span class="at">stan_object =</span> M3, <span class="at">stan_data =</span> stan_data_M3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>List of 9
- $ N_sp_i_MC2       : int 10
- $ N_obs_Y_M5       : int 6
- $ alr_M5           :List of 10
-  ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
-  ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
-  ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
-  ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
-  ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
-  ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
-  ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
-  ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
-  ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
-  ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
- $ Y_M5             : tibble [10 × 6] (S3: tbl_df/tbl/data.frame)
-  ..$ Mock_1: int [1:10] 26537 63611 103953 228228 72751 99815 75120 66110 41550 72763
-  ..$ Mock_2: int [1:10] 26282 38494 53527 124488 35851 29082 44139 36235 19983 56460
-  ..$ Mock_3: int [1:10] 55800 80634 96043 237519 94465 130790 77521 58501 44716 111345
-  ..$ Mock_4: int [1:10] 37606 58797 83638 194652 58157 120742 70449 52223 44234 82212
-  ..$ Mock_5: int [1:10] 34698 37921 50442 107854 31141 58762 48500 38270 27283 52685
-  ..$ Mock_6: int [1:10] 82587 95245 118507 256737 90112 162580 91900 75811 63749 112193
- $ NPCR             : num 43
- $ alpha_magnitude  : num 0.1
- $ Species          : tibble [10 × 1] (S3: tbl_df/tbl/data.frame)
-  ..$ Species: chr [1:10] &quot;Brosme brosme&quot; &quot;Cyclopterus lumpus&quot; &quot;Hippoglossoides platessoides&quot; &quot;Leptoclinus maculatus&quot; ...
- $ mock_initial_conc: tibble [10 × 2] (S3: tbl_df/tbl/data.frame)
-  ..$ i_c : int [1:10] 6022 12061 6812 3725 9816 7087 8908 4477 2637 5942
-  ..$ prop:List of 10
-  .. ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
-  .. ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
-  .. ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
-  .. ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
-  .. ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
-  .. ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
-  .. ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
-  .. ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
-  .. ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
-  .. ..$ : num [1:10] 0 0 0 0 0 0 0 0 0 0
- $ species_idx      : tibble [10 × 1] (S3: tbl_df/tbl/data.frame)
-  ..$ sp_idx: int [1:10] 1 2 3 4 5 6 7 8 9 10</code></pre>
+<pre><code>Error in eval(expr, envir) : 
+  Exception: mismatch in number dimensions declared and found in context; processing stage=data initialization; variable name=alr_M5; dims declared=(10); dims found=(10,10) (in &#39;M3 model&#39;, line 7, column 2 to column 28)</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># # Run the model</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># M3_output &lt;- Run_Model(stan_object = M3, stan_data = stan_data_M3)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>failed to create the sampler; sampling not done</code></pre>
+</div>
 </div>
 </section>
 <section id="plot-outputs-of-model-2" class="level3" data-number="0.5">

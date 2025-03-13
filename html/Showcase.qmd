@@ -199,7 +199,7 @@ $$ {#eq-qpcr}
 ### Run Model 3
 
 ```{r, warning=FALSE, message=FALSE,results='hide'}
-# M3 <- load_model('M3')
+M3 <- load_model('M3')
 ```
 
 ```{r}
@@ -216,9 +216,9 @@ stan_data_M3 <- prep_stan_M3(
 	number_of_PCR = 43,
 	alpha_magnitude = 0.1)
 str(stan_data_M3)
-# 
-# # Run the model
-# M3_output <- Run_Model(stan_object = M3, stan_data = stan_data_M3)
+
+# Run the model
+M3_output <- Run_Model(stan_object = M3, stan_data = stan_data_M3)
 ```
 
 ### Plot outputs of Model 2
