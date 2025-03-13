@@ -31,5 +31,7 @@ load_QM_packages()
 
 ## Citation
 If you use any part of this repository in your work, please cite:
+
 **Guri, G., Shelton, A.O., Kelly, R.P., et al. (2024). Predicting trawl catches using environmental DNA .**
+
 **Guri, G., Ray, J.L., Shelton, A.O., et al. (2024). Quantifying the detection sensitivity and precision of qPCR and ddPCR mechanisms for eDNA samples.**
