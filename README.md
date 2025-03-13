@@ -28,6 +28,8 @@ load_QM_packages()
 [Click here to view a showcase in R on how to use the model (html)](https://html-preview.github.io/?url=https://github.com/gledguri/QM/blob/main/R/Showcase.html)
 
 
+![QM model overview](Images/Model_layout.jpg)
+
 
 ## Citation
 If you use any part of this repository in your work, please cite:

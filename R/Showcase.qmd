@@ -40,10 +40,11 @@ data(metabarcoding);force(metabarcoding)
 M1 <- load_model('M1')
 
 # Prepare the data for going into the model
-stan_data_M1 <- prep_stan_M1(qpcr_data = qpcr %>% filter(Sample_type=="STANDARD"),
-														 Ct = "Ct",
-														 standard_concentration = "Std_concentration",
-														 plate_index = 'Plate')
+stan_data_M1 <- prep_stan_M1(
+	qpcr_data = qpcr %>% filter(Sample_type=="STANDARD"),
+	Ct = "Ct",
+	standard_concentration = "Std_concentration",
+	plate_index = 'Plate')
 
 # Run the model
 M1_output <- Run_Model(stan_object = M1, stan_data = stan_data_M1)
