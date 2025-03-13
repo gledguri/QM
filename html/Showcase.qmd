@@ -78,7 +78,7 @@ load_QM_packages()
 ### Load the data
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-data(qpcr);force(qpcr)
+data(cod_qpcr);force(cod_qpcr)
 data(metabarcoding);force(metabarcoding)
 ```
 
