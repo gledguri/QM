@@ -1479,7 +1479,7 @@ prep_stan_M3 <- function(metabarcoding_data,
 		Species = mock_sp_names,
 		mock_initial_conc = ini_mock,
 		species_idx = species_idx
-	);str(stan_data)
+	)
 	return(stan_data)
 }
 

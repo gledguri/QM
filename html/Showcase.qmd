@@ -15,7 +15,7 @@ format:
     # css: 'style_gg.css'
     grid:
       sidebar-width: 200px
-      body-width: 880px
+      body-width: 750px
       margin-width: 200px
       gutter-width: 1.5rem
 author: Gled Guri
@@ -67,91 +67,164 @@ options(width = 300) #wd
 options(width = dwidth)#wd
 ```
 
-
 ### Load the package and its dependencies
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-devtools::install_github("gledguri/QM",dependencies = TRUE, force = T );
+devtools::install_github("gledguri/QM",dependencies = TRUE, force = T )
 library(QM)
 load_QM_packages()
 ```
 
 ### Load the data
 
-```{r}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 data(qpcr);force(qpcr)
 data(metabarcoding);force(metabarcoding)
 ```
 
-<!-- ### Run Model 1 -->
+```{r, include=FALSE, warning=FALSE, message=FALSE}
+options(width = 1300) #wd
+```
 
-<!-- ```{r} -->
-<!-- M1 <- load_model('M1') -->
+```{r}
+qpcr
+metabarcoding
+```
+```{r, include=FALSE, warning=FALSE, message=FALSE}
+options(width = 300) #wd
+```
+### Run Model 1
+
+Here we make use of the standard concentration to learn the parameters that link the known DNA concentration with observed Ct values (Y) and positive / negative qPCR amplification (Z)
+
+$$
+\begin{aligned}
+&\text{qPCR probability of detection model}\\
+Z_{ij} &\sim \text{Bernoulli}(\theta_{i}) && \text{(1.1)} \\
+\theta_{i} &= 1 - exp(-W_{i} \cdot \phi) && \text{(1.2)} \\
+&\text{qPCR continuous model}\\
+Y_{ij} &\sim \text{Normal}(\mu_{i}, \sigma_{i}) && \text{(2.1)} \\
+\mu_{i} &= \beta0_{p} + \beta1 \cdot ln(C_{i}) && \text{(2.2)} \\
+\sigma_{i} &= e^{(\gamma0 + \gamma1 \cdot ln(C_{i}))} && \text{(2.3)}
+\end{aligned}
+$$ {#eq-qpcr}
+
+
+<!-- ```{r} --> <!-- M1 <- load_model('M1') -->
 
 <!-- # Prepare the data for going into the model -->
+
 <!-- stan_data_M1 <- prep_stan_M1( -->
-<!-- 	qpcr_data = qpcr %>% filter(Sample_type=="STANDARD"), -->
-<!-- 	Ct = "Ct", -->
-<!-- 	standard_concentration = "Std_concentration", -->
-<!-- 	plate_index = 'Plate') -->
+
+<!--    qpcr_data = qpcr %>% filter(Sample_type=="STANDARD"), -->
+
+<!--    Ct = "Ct", -->
+
+<!--    standard_concentration = "Std_concentration", -->
+
+<!--    plate_index = 'Plate') -->
 
 <!-- # Run the model -->
+
 <!-- M1_output <- Run_Model(stan_object = M1, stan_data = stan_data_M1) -->
+
 <!-- ``` -->
 
 <!-- ### Plot outputs of Model 1 -->
 
 <!-- ```{r, fig.width=8, fig.height=5} -->
+
 <!-- extract_qpcr_param(M1_output) %>% as.tibble() -->
+
 <!-- plot_qpcr_prob_det(M1_output) -->
+
 <!-- plot_qpcr_cont_mod(M1_output) -->
+
 <!-- ``` -->
 
 <!-- ```{r, fig.width=17, fig.height=6} -->
+
 <!-- plot_qpcr_curves(M1_output) -->
+
 <!-- ``` -->
 
 <!-- ```{r, fig.width=15, fig.height=9} -->
+
 <!-- plot_qpcr_cont_mod_plate_specific(M1_output) -->
+
 <!-- ``` -->
 
-### Run Model 2
+<!-- ### Run Model 2 -->
+
+<!-- ```{r, warning=FALSE, message=FALSE,results='hide'} -->
+<!-- M2 <- load_model('M2') -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- # Prepare the data for going into the model -->
+<!-- stan_data_M2 <- prep_stan_M2( -->
+<!-- 	qpcr_data = qpcr, -->
+<!-- 	sample_type = "Sample_type", -->
+<!-- 	Ct = "Ct", -->
+<!-- 	sample_name_column = "Sample_name", -->
+<!-- 	standard_concentration = "Std_concentration", -->
+<!-- 	plate_index = 'Plate') -->
+
+<!-- # Run the model -->
+<!-- M2_output <- Run_Model(stan_object = M2, stan_data = stan_data_M2) -->
+<!-- ``` -->
+
+<!-- ### Plot outputs of Model 2 -->
+
+<!-- ```{r, fig.width=17, fig.height=6, warning=FALSE, message=FALSE} -->
+<!-- extract_qpcr_param(M2_output) %>% as_tibble() -->
+<!-- extract_est_conc(M2_output) %>% as_tibble() -->
+<!-- plot_qpcr_curves(M2_output) -->
+<!-- ``` -->
+
+<!-- ```{r, fig.width=10, fig.height=5, warning=FALSE, message=FALSE} -->
+<!-- plot_qpcr_prob_det(M2_output) -->
+<!-- plot_qpcr_cont_mod(M2_output) -->
+<!-- ``` -->
+
+<!-- ```{r, fig.width=17, fig.height=9, warning=FALSE, message=FALSE} -->
+<!-- plot_qpcr_cont_mod_plate_specific(M2_output) -->
+<!-- ``` -->
+
+<!-- ```{r, fig.width=17, fig.height=8, warning=FALSE, message=FALSE} -->
+<!-- plot_est_conc(M2_output) -->
+<!-- ``` -->
+
+
+### Run Model 3
+
+```{r, warning=FALSE, message=FALSE,results='hide'}
+# M3 <- load_model('M3')
+```
 
 ```{r}
-M2 <- load_model('M2')
+# Trim metabarcoding data only for mock samples
+moc_dat <- metabarcoding %>% select(Species,sp_idx,ini_conc,Mock_1:Mock_6)
 
-# Prepare the data for going into the model
-stan_data_M2 <- prep_stan_M2(
-	qpcr_data = qpcr,
-	sample_type = "Sample_type",
-	Ct = "Ct",
-	sample_name_column = "Sample_name",
-	standard_concentration = "Std_concentration",
-	plate_index = 'Plate')
-
-# Run the model
-M2_output <- Run_Model(stan_object = M2, stan_data = stan_data_M2)
+# # Prepare the data for going into the model
+stan_data_M3 <- prep_stan_M3(
+	metabarcoding_data = moc_dat,
+	mock_sequencing_columns = c('Mock_1','Mock_2','Mock_3','Mock_4','Mock_5','Mock_6'),
+	mock_initial_concentration = 'ini_conc',
+	species_index = 'sp_idx',
+	species_names = 'Species',
+	number_of_PCR = 43,
+	alpha_magnitude = 0.1)
+str(stan_data_M3)
+# 
+# # Run the model
+# M3_output <- Run_Model(stan_object = M3, stan_data = stan_data_M3)
 ```
 
-### Plot outputs of Model 1
+### Plot outputs of Model 2
 
-```{r, fig.width=17, fig.height=6}
-extract_qpcr_param(M2_output) %>% as.tibble()
-extract_est_conc(M2_output) %>% as.tibble()
-plot_qpcr_curves(M2_output)
+```{r, fig.width=17, fig.height=10}
+# extract_amp_efficiecy(M3_output)
+# amp_eff_output_extract(M3_output)
+# plot_amp_eff(M3_output)
 ```
-
-```{r, fig.width=8, fig.height=5, warning=FALSE, message=FALSE}
-plot_qpcr_prob_det(M2_output)
-plot_qpcr_cont_mod(M2_output)
-```
-
-```{r, fig.width=15, fig.height=9, warning=FALSE, message=FALSE}
-plot_qpcr_cont_mod_plate_specific(M2_output)
-```
-
-```{r, fig.width=8, fig.height=5, warning=FALSE, message=FALSE}
-plot_est_conc(M2_output)
-```
-
-
