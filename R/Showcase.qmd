@@ -27,7 +27,8 @@ editor_options:
 
 ### Load the package and its dependencies
 ```{R, error=FALSE, message=FALSE, results=FALSE}
-devtools::install_github("gledguri/QM",dependencies = TRUE, force = T );library(QM)
+# devtools::install_github("gledguri/QM",dependencies = TRUE, force = T );
+library(QM)
 load_QM_packages()
 ```
 
