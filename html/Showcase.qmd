@@ -25,9 +25,52 @@ editor_options:
   chunk_output_type: console
 ---
 
+```{=html}
+<style>
+body {
+  font-family: Arial, sans-serif;
+  font-size: 18px;
+}
+
+h1 {
+  font-size: 22px;  /* Adjust the size of H1 headers */
+  font-weight: normal;  /* Make H1 headers not bold */
+}
+
+h2 {
+  font-size: 18px;  /* Adjust the size of H2 headers */
+  font-weight: normal;  /* Make H2 headers not bold */
+}
+
+h3 {
+  font-size: 18px;  /* Adjust the size of H3 headers */
+  font-weight: normal;  /* Make H3 headers not bold */
+}
+
+h4 {
+  font-size: 18px;  /* Adjust the size of H4 headers */
+  font-weight: normal;  /* Make H4 headers not bold */
+}
+</style>
+```
+
+```{r, include=FALSE}
+dwidth <- 150
+options(width = dwidth)
+```
+
+```{r, include=FALSE, warning=FALSE, message=FALSE}
+options(width = 300) #wd
+```
+
+```{r, include=FALSE, warning=FALSE, message=FALSE}
+options(width = dwidth)#wd
+```
+
+
 ### Load the package and its dependencies
 
-```{R, error=FALSE, message=FALSE, results=FALSE}
+```{r, warning=FALSE, message=FALSE, results='hide'}
 devtools::install_github("gledguri/QM",dependencies = TRUE, force = T );
 library(QM)
 load_QM_packages()
@@ -35,45 +78,46 @@ load_QM_packages()
 
 ### Load the data
 
-```{R}
+```{r}
 data(qpcr);force(qpcr)
 data(metabarcoding);force(metabarcoding)
 ```
 
-### Run Model 1
+<!-- ### Run Model 1 -->
 
-```{R}
-M1 <- load_model('M1')
+<!-- ```{r} -->
+<!-- M1 <- load_model('M1') -->
 
-# Prepare the data for going into the model
-stan_data_M1 <- prep_stan_M1(
-	qpcr_data = qpcr %>% filter(Sample_type=="STANDARD"),
-	Ct = "Ct",
-	standard_concentration = "Std_concentration",
-	plate_index = 'Plate')
+<!-- # Prepare the data for going into the model -->
+<!-- stan_data_M1 <- prep_stan_M1( -->
+<!-- 	qpcr_data = qpcr %>% filter(Sample_type=="STANDARD"), -->
+<!-- 	Ct = "Ct", -->
+<!-- 	standard_concentration = "Std_concentration", -->
+<!-- 	plate_index = 'Plate') -->
 
-# Run the model
-M1_output <- Run_Model(stan_object = M1, stan_data = stan_data_M1)
-```
+<!-- # Run the model -->
+<!-- M1_output <- Run_Model(stan_object = M1, stan_data = stan_data_M1) -->
+<!-- ``` -->
 
-```{R}
-# diagnose_model(M1_output)
-```
+<!-- ### Plot outputs of Model 1 -->
 
-### Plot outputs of Model 1
+<!-- ```{r, fig.width=8, fig.height=5} -->
+<!-- extract_qpcr_param(M1_output) %>% as.tibble() -->
+<!-- plot_qpcr_prob_det(M1_output) -->
+<!-- plot_qpcr_cont_mod(M1_output) -->
+<!-- ``` -->
 
-```{R}
-#| fig-width: 800
-extract_qpcr_param(M1_output)
-plot_qpcr_prob_det(M1_output)
-plot_qpcr_cont_mod(M1_output)
-plot_qpcr_curves(M1_output)
-plot_qpcr_cont_mod_plate_specific(M1_output)
-```
+<!-- ```{r, fig.width=17, fig.height=6} -->
+<!-- plot_qpcr_curves(M1_output) -->
+<!-- ``` -->
+
+<!-- ```{r, fig.width=15, fig.height=9} -->
+<!-- plot_qpcr_cont_mod_plate_specific(M1_output) -->
+<!-- ``` -->
 
 ### Run Model 2
 
-```{R}
+```{r}
 M2 <- load_model('M2')
 
 # Prepare the data for going into the model
@@ -89,135 +133,25 @@ stan_data_M2 <- prep_stan_M2(
 M2_output <- Run_Model(stan_object = M2, stan_data = stan_data_M2)
 ```
 
-```{R}
-# diagnose_model(M2_output)
+### Plot outputs of Model 1
+
+```{r, fig.width=17, fig.height=6}
+extract_qpcr_param(M2_output) %>% as.tibble()
+extract_est_conc(M2_output) %>% as.tibble()
+plot_qpcr_curves(M2_output)
 ```
 
-### Plot outputs of Model 2
-
-```{R}
-#| fig-width: 800
-extract_est_conc(M2_output)
-plot_qpcr_curves(M2_output)
+```{r, fig.width=8, fig.height=5, warning=FALSE, message=FALSE}
 plot_qpcr_prob_det(M2_output)
 plot_qpcr_cont_mod(M2_output)
+```
+
+```{r, fig.width=15, fig.height=9, warning=FALSE, message=FALSE}
 plot_qpcr_cont_mod_plate_specific(M2_output)
+```
+
+```{r, fig.width=8, fig.height=5, warning=FALSE, message=FALSE}
 plot_est_conc(M2_output)
 ```
 
-### Run Model 3
 
-```{R}
-M3 <- load_model('M3')
-
-# Trim metabarcoding data only for mock samples
-moc_dat <- metabarcoding %>% select(Species,sp_idx,ini_conc,Mock_1:Mock_6)
-
-# Prepare the data for going into the model
-stan_data_M3 <- prep_stan_M3(
-	metabarcoding_data = moc_dat,
-	mock_sequencing_columns = c('Mock_1','Mock_2','Mock_3','Mock_4','Mock_5','Mock_6'),
-	mock_initial_concentration = 'ini_conc',
-	species_index = 'sp_idx',
-	species_names = 'Species',
-	number_of_PCR = 43,
-	alpha_magnitude = 0.1)
-
-
-# Run the model
-M3_output <- Run_Model(stan_object = M3, stan_data = stan_data_M3)
-```
-
-```{R}
-# diagnose_model(M3_output)
-```
-
-### Plot outputs of Model 3
-
-```{R}
-extract_amp_efficiecy(M3_output)
-amp_eff_output_extract(M3_output)
-plot_amp_eff(M3_output)
-```
-
-### Run Model 4
-
-```{R}
-M4 <- load_model('M4')
-
-# Get column names for mock samples and environmental samples
-mock_columns <- metabarcoding %>% select(Mock_1:Mock_6) %>% names()
-sample_columns <- metabarcoding %>% select(-all_of(mock_columns),-Species,-sp_idx,-ini_conc) %>% names()
-
-# Prepare the data for going into the model
-stan_data_M4 <- prep_stan_M4(
-	metabarcoding_data = metabarcoding,
-	mock_sequencing_columns = mock_columns,
-	sample_sequencing_columns = sample_columns,
-	mock_initial_concentration = 'ini_conc',
-	species_index = 'sp_idx',
-	species_names = 'Species',
-	number_of_PCR = 43,
-	alpha_magnitude = 0.1)
-
-M4_output <- Run_Model(stan_object = M4, stan_data = stan_data_M4)
-```
-
-```{R}
-# diagnose_model(M4_output)
-```
-
-### Plot outputs of Model 4
-
-```{R}
-extract_amp_efficiecy(M4_output)
-amp_eff_output_extract(M4_output)
-plot_amp_eff(M4_output)
-extract_ini_prop(M4_output)
-bar_plot_est_ini_prop(M4_output)
-heatmap_plot_est_ini_prop(M4_output)
-```
-
-```{R}
-M5 <- load_model('M5')
-
-mock_columns <- metabarcoding %>% select(Mock_1:Mock_6) %>% names()
-sample_columns <- metabarcoding %>% select(-all_of(mock_columns),-Species,-sp_idx,-ini_conc) %>% names()
-
-
-stan_data_M5 <- prep_stan_M5(
-	qpcr_data = qpcr,
-	sample_type = "SampleType",
-	Ct = "Ct",
-	sample_name_column = "Sample_name",
-	standard_concentration = "int_concentation",
-	plate_index = 'plate',
-	metabarcoding_data = metabarcoding,
-	mock_sequencing_columns = mock_columns,
-	sample_sequencing_columns = sample_columns,
-	mock_initial_concentration = 'ini_conc',
-	species_index = 'sp_idx',
-	species_names = 'Species',
-	number_of_PCR = 43,
-	alpha_magnitude = 0.1)
-
-M5_output <- Run_Model(stan_object = M5, stan_data = stan_data_M5,
-											 treedepth = 12,iterations = 2000,warmup = 1000)
-```
-
-```{R}
-# diagnose_model(M5_output)
-```
-
-### Plot outputs of Model 5
-
-```{R}
-extract_amp_efficiecy(M5_output)
-amp_eff_output_extract(M5_output)
-plot_amp_eff(M5_output)
-extract_ini_prop(M5_output)
-bar_plot_est_ini_prop(M5_output)
-bar_plot_est_ini_prop(M4_output)
-heatmap_plot_est_ini_prop(M5_output)
-plot_est_ini_conc(M5_output)
-```

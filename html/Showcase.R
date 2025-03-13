@@ -1,6 +1,6 @@
 devtools::install_github("gledguri/QM",dependencies = TRUE, force = T );library(QM)
 load_QM_packages()
-
+library(here)
 # Load data -----------------------------------------------------------------------------------
 data(qpcr);force(qpcr)
 data(metabarcoding);force(metabarcoding)
@@ -11,7 +11,7 @@ M1 <- load_model('M1')
 # Prepare the data for going into the model
 stan_data_M1 <- prep_stan_M1(qpcr_data = qpcr %>% filter(Sample_type=="STANDARD"),
 														 Ct = "Ct",
-														 standard_concentration = "st_concentration",
+														 standard_concentration = "Std_concentration",
 														 plate_index = 'Plate')
 
 # Run the model
@@ -32,7 +32,7 @@ stan_data_M2 <- prep_stan_M2(qpcr_data = qpcr,
 														 sample_type = "Sample_type",
 														 Ct = "Ct",
 														 sample_name_column = "Sample_name",
-														 standard_concentration = "st_concentration",
+														 standard_concentration = "Std_concentration",
 														 plate_index = 'Plate')
 
 # Run the model

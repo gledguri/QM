@@ -782,13 +782,11 @@ If you still wish to continue use the model create an artifical non-detect row i
 		S_q_p = log(st_qpcr_cm$st_conc),
 		label_qpcr_plate = label_qpcr_plate
 	)
-	cat('Total number of samples included in the model is: ',stan_data$N_st_q);cat('\n')
-	cat('Number of samples with positive amplification: ',stan_data$N_st_qp);cat('\n')
-	cat('Total number of plates included is: ',stan_data$N_plate);cat('\n')
+	# cat('Total number of samples included in the model is: ',stan_data$N_st_q);cat('\n')
+	# cat('Number of samples with positive amplification: ',stan_data$N_st_qp);cat('\n')
+	# cat('Total number of plates included is: ',stan_data$N_plate);cat('\n')
 	if(stan_data$N_plate==max(stan_data$plate_st_idx)){cat('Plate index matches the total number of plates')}
 	if(stan_data$N_plate!=max(stan_data$plate_st_idx)){cat('Plate index DOES NOT match the total number of plates')}
-	cat('\n');cat('\n')
-	cat(str(stan_data))
 	return(stan_data)
 }
 
@@ -1297,15 +1295,13 @@ If you wish to include those, change the \"sample_type\" asigned value to UNKNOW
 		label_qpcr_sample = label_qpcr_sample,
 		label_qpcr_plate = label_qpcr_plate
 	)
-	cat('Total number of STANDARD samples included in the model is: ',stan_data$N_st_q);cat('\n')
-	cat('Number of STANDARD samples with positive amplification: ',stan_data$N_st_qp);cat('\n')
-	cat('Total number of UNKNOWN samples included in the model is: ',stan_data$N_en_q);cat('\n')
-	cat('Number of UNKNOWN samples with positive amplification: ',stan_data$N_en_qp);cat('\n')
-	cat('Total number of plates included is: ',stan_data$N_plate);cat('\n')
+	# cat('Total number of STANDARD samples included in the model is: ',stan_data$N_st_q);cat('\n')
+	# cat('Number of STANDARD samples with positive amplification: ',stan_data$N_st_qp);cat('\n')
+	# cat('Total number of UNKNOWN samples included in the model is: ',stan_data$N_en_q);cat('\n')
+	# cat('Number of UNKNOWN samples with positive amplification: ',stan_data$N_en_qp);cat('\n')
+	# cat('Total number of plates included is: ',stan_data$N_plate);cat('\n')
 	if(stan_data$N_plate==max(stan_data$plate_st_idx)){cat('Plate index matches the total number of plates')}
 	if(stan_data$N_plate!=max(stan_data$plate_st_idx)){cat('Plate index DOES NOT match the total number of plates')}
-	cat('\n');cat('\n')
-	cat(str(stan_data))
 	return(stan_data)
 }
 
