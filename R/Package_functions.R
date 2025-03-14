@@ -1534,13 +1534,13 @@ amp_eff_output_extract <- function(model_output){
 		stan_data$Species %>% as.data.frame() %>% setNames('Species'),
 		stan_data$alr_M5 %>% exp() %>% as.data.frame() %>% rel_ab() %>% setNames('Pre-PCR'),
 		rowMeans(stan_data$Y_M5) %>% as.data.frame() %>% setNames('Post-PCR') %>% rel_ab(),
-		stan_data$alr_M5 %>% as.data.frame() %>% setNames('ALR')) %>%
+		stan_data$alr_M5 %>% as.data.frame() %>% setNames('eta')) %>%
 		# rownames_to_column("x") %>% select(-x) %>% column_to_rownames("Species") %>%
-		mutate(`Post-PCR_est` = exp(ALR + (stan_data$NPCR * amp_eff_param$alpha))) %>%
+		mutate(`Post-PCR_est` = exp(eta + (stan_data$NPCR * amp_eff_param$alpha))) %>%
 		rel_col('Post-PCR_est') %>%
-		mutate(`Post-PCR_est_2.5%_CI` = exp(ALR + (stan_data$NPCR * amp_eff_param$`alpha_2.5%_CI`))) %>%
+		mutate(`Post-PCR_est_2.5%_CI` = exp(eta + (stan_data$NPCR * amp_eff_param$`alpha_2.5%_CI`))) %>%
 		rel_col('Post-PCR_est_2.5%_CI') %>%
-		mutate(`Post-PCR_est_97.5%_CI` = exp(ALR + (stan_data$NPCR * amp_eff_param$`alpha_97.5%_CI`))) %>%
+		mutate(`Post-PCR_est_97.5%_CI` = exp(eta + (stan_data$NPCR * amp_eff_param$`alpha_97.5%_CI`))) %>%
 		rel_col('Post-PCR_est_97.5%_CI')
 	return(output)
 }
