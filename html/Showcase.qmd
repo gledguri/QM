@@ -130,7 +130,6 @@ In short the presence (Z = 1) or absence (Z = 0) of qPCR amplification in sample
 Additionally the second compartment models the observed Ct values (Y) in sample $i$ in technical replicate $j$ as random variable drawn from a Normal distribution with mean $\mu$ and standard deviation $\sigma$. We model $\mu$ as a linear function of DNA concentration (C) with intercept and slope $\beta0$ and $\beta1$ (Equation 2.2). The standard deviation of the observed Y is an exponential function of DNA concentration with intercept and slope $\gamma0$ and $\gamma1$ (Equation 2.3). Note that $\beta0$ (intercept between Ct and DNA concentration) has subscript $_p$ meaning that is different for every plate. The reason for having a different $\beta0$ is due to the qPCR machine being sensitive to external factors hence every qPCR run has a different $\Delta$Rn (normalized fluorescence signal).
 
 $$
-
 \Large
 \begin{aligned}
 &\textbf{qPCR probability of detection model}\\
@@ -300,14 +299,11 @@ M3 <- load_model('M3')
 
 ## Prepare the data to be loaded in the model.
 
-The data should be formatted in a particular form. Please use `data_example('M3')` to see the data format for required for Model 2 or use `data(metabarcoding)` to load the data included in the package and select the columns that belong to the mock community. 
+The data should be formatted in a particular form. Please use `data_example('M3')` to see the data format for required for Model 2 or use `data(metabarcoding)` to load the data included in the package and select the columns that belong to the mock community.
 
 Important! Please assign 'Zz\_' before the name of the reference species and assign it on the last row on the metabarcoding dataframe.
 
-An additional feature is the `alpha magnitude` you can indicate the prior distribution of $\alpha$ parameter. 
-
-
-
+An additional feature is the `alpha magnitude` where the user can indicate the standard deviation of a Normal distribution with mean 0 (prior distribution) for $\alpha$ parameter. This is left on purpose to be adjusted by the users as not all data are similar. On default `alpha = 0.1` but to put values in perspective alpha values = \|0.1\| indicates a 4 fold difference between pre- and post-PCR (typical 40 cycles) relative to the reference species. Typical `alpha` values for 12S MiFish primers are \< \|0.03\|.
 
 ```{r}
 # Trim metabarcoding data only for mock samples
@@ -324,7 +320,8 @@ stan_data_M3 <- prep_stan_M3(
 	alpha_magnitude = 0.1)
 ```
 
-## Run the model.
+## Run the model
+
 ```{r}
 M3_output <- Run_Model(stan_object = M3, stan_data = stan_data_M3)
 ```
@@ -345,6 +342,7 @@ plot_amp_eff(M3_output)
 ```
 
 # Model 4 {#Model_4}
+Model 4 is a continuation of [Model 3](#Model_3) by incorporating environmental samples (e.g., field-collected data) alongside mock commuinty samples. By sharing the $alpha$ parameter learned from the mock community, it estimates the pre-PCR (initial) relative abundance for imputed field samples (`Sample_name`). The estimated initial DNA relative abundance from environmental samples can be extracted from the model output using `extract_ini_prop(M4_output)` function [see here](#M4_extract). The mathematical notation is the same as [Model 3](#Model_3) where 2 set of equations (eq 3.1 - 3.3) are used, one for mock community and one for the unknown environmental samples where the only join information they share is the alpha parameter.
 
 ## Load the stan model
 
@@ -369,11 +367,14 @@ stan_data_M4 <- prep_stan_M4(
 	species_names = 'Species',
 	number_of_PCR = 43,
 	alpha_magnitude = 0.1)
+```
 
+## Run the model
+```{r}
 M4_output <- Run_Model(stan_object = M4, stan_data = stan_data_M4)
 ```
 
-## Extract outputs
+## Extract outputs {#M4_extract}
 
 ```{r}
 extract_amp_efficiecy(M4_output)
@@ -401,6 +402,15 @@ heatmap_plot_est_ini_prop(M4_output)
 ```
 
 # Model 5 {#Model_5}
+
+If you remember these equations from Model 4 where everything was relative (proportional) to the reference species and we couldn't escape proportionallity. In Model 5 we use the information from Model 2 to estimate the absolute DNA concentration for the reference species in each environmental sample ()
+
+$$ 
+\Large \begin{align*} 
+{\gamma}_{is}&= ln\left(\frac{C_{is}}{C_{i,s=\text{ref}}}\right) + NPCR \cdot \alpha &&\text{3.3} \\ 
+{\gamma}_{is}&= ln(C_{is})-ln(C_{i,s=\text{ref}}) + NPCR \cdot \alpha &&\text{3.4} \\ 
+\end{align*} 
+$$
 
 ## Load the stan model
 
