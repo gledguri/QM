@@ -25,7 +25,7 @@ library(QM)
 load_QM_packages()
 ```
 
-[Click here to view a showcase in R on how to use the model (html)](https://html-preview.github.io/?url=https://github.com/gledguri/QM/blob/main/html/Showcase.html)
+[Click here to view a showcase in R on how to use the model](https://html-preview.github.io/?url=https://github.com/gledguri/QM/blob/main/html/Showcase.html)
 
 
 ![QM model overview](Images/Model_layout.jpg)

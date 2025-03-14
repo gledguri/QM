@@ -65,7 +65,9 @@ options(width = 300) #wd
 options(width = dwidth)#wd
 ```
 
-If you end up using any of the following model please cite [Guri et al., 2024 (Quantifying the Detection Sensitivity and Precision of qPCR and ddPCR Mechanisms for eDNA Samples)](https://onlinelibrary.wiley.com/doi/full/10.1002/ece3.70678) for models 1 and 2. For models 3 - 5 please cite [Guri et al., 2024 (Predicting trawl catches using environmental DNA)](https://academic.oup.com/icesjms/article/81/8/1536/7728836)
+Please cite:
+Guri et al., [(2024)](https://onlinelibrary.wiley.com/doi/full/10.1002/ece3.70678) Quantifying the Detection Sensitivity and Precision of qPCR and ddPCR Mechanisms for eDNA Samples) for Models 1-2.
+Guri et al., [(2024)](https://academic.oup.com/icesjms/article/81/8/1536/7728836) (Predicting trawl catches using environmental DNA) for models 3-5.
 
 This package is designed to simplify complex mathematical processes, allowing researchers, resource managers, and technicians to analyze environmental DNA (eDNA) data without needing advanced mathematical expertise. By using Bayesian inference, the package helps estsimate eDNA concentration from field samples. This package is currently in beta development, and new features and improved documentation are ongoing. Please feel free to reach out with any questions or feedback.
 
@@ -81,7 +83,7 @@ This package includes 5 models that can be used individually or joined within 3 
 First things first, load the package and its dependencies.
 
 ```{r, warning=FALSE, message=FALSE, results='hide'}
-devtools::install_github("gledguri/QM",dependencies = TRUE, force = T )
+devtools::install_github("gledguri/QM")
 library(QM)
 load_QM_packages()
 ```
@@ -333,8 +335,7 @@ M3_output <- Run_Model(stan_object = M3, stan_data = stan_data_M3)
 
 These two functions extract the amplification efficiency from the [Model 3](#Model_3) (eq 3.3). The function `extract_amp_efficiecy` extracts the values of $\alpha_s$ parameter with 95% credible intervals (CI). Note that the values are in additive log-ratios and the reference species = 0 ($ln(1) = 0$. Each `alpha` value can be interpreted as the log-difference of amplification efficiency of the species relative to the reference species per each PCR cycle. Any negative value would be indicating less efficient amplification than the reference species and positive values vice-versa. Let's say a value `-0.015` is indicating that the species is amplifying `-0.015` times less 'efficient' per each PCR cycle than that of the reference species.
 
-The function `amp_eff_output_extract` creates a data frame that puts things in perspective by extracting and computing the values on [Equation 3.3]({#Model_3})
-
+The function `amp_eff_output_extract` creates a data frame that puts things in perspective by extracting and computing the values on [Equation 3.3](%7B#Model_3%7D)
 
 ```{r}
 extract_amp_efficiecy(M3_output)
@@ -365,7 +366,6 @@ Important! Please assign 'Zz\_' before the name of the reference species and ass
 
 An additional feature is the `ini_prop_mu` and `ini_prop_sd` that can be added as arguments in `prep_stan_M4`. These 2 parameter are the mean (`ini_prop_mu`) and the standard deviation (`ini_prop_sd`) of the $\eta$ initial (pre-PCR) abundances prior distribution wichi follows a Normal distribution. By default these values are `ini_prop_mu = 0` and `ini_prop_sd = 5` indicating that $\eta \sim \mathcal{N}(0,5)$ and has a lower boundry at $-30$ indicating that initial DNA concnetration log-ratios can not be lower than $e^{-30} \approx 10^{-15}$. This is left on purpose to be adjusted by the users as this prior is not very informative hence users should adjust based on the prior knowledge on the nature of the data. To put values in perspective eta values = \|2\| or \|4\| indicates an 8 or 80 fold difference respectively between initial (pre-PCR) abundance between the species $s$ and the reference species.
 
-
 ```{r, warning=FALSE, message=FALSE}
 # Get column names for mock samples and environmental samples
 mock_columns <- metabarcoding %>% select(Mock_1:Mock_6) %>% names()
@@ -392,7 +392,6 @@ M4_output <- Run_Model(stan_object = M4, stan_data = stan_data_M4)
 ## Extract outputs {#M4_extract}
 
 These set of functions are extracting the same parameter as in [Model 3](#M3_extract). An additional function here is `extract_ini_prop` which extracts the pre-PCR (initial) proportions for each amplicon imputed. The output is a data frame where columns are field (unknown) samples and rows are species.
-
 
 ```{r}
 extract_amp_efficiecy(M4_output)
@@ -464,12 +463,11 @@ stan_data_M5 <- prep_stan_M5(
 
 ## Run the model
 
-This model is slightly more expensive computationally compared to the other models. Often times the default `treedeoth` is exceeded hence limiting the perfect exploration of the parameter space for assuring the model posterior likelihood has converged. Here is advisable to add the argument `treedepth = 12`. The model output can be diagnosed by using `diagnose_model(model_output)` and check if the treedepth is being a limiting factor. 
-
+This model is slightly more expensive computationally compared to the other models. Often times the default `treedeoth` is exceeded hence limiting the perfect exploration of the parameter space for assuring the model posterior likelihood has converged. Here is advisable to add the argument `treedepth = 12`. The model output can be diagnosed by using `diagnose_model(model_output)` and check if the treedepth is being a limiting factor.
 
 ```{r}
 M5_output <- Run_Model(stan_object = M5, stan_data = stan_data_M5,
-											 treedepth = 12,iterations = 2000,warmup = 1000)
+											 treedepth = 12,iterations = 3000,warmup = 1500)
 ```
 
 ## Extract outputs
@@ -502,14 +500,22 @@ bar_plot_est_ini_prop(M5_output)
 plot_est_ini_conc(M5_output)
 ```
 
-[Guri et al., 2024](https://onlinelibrary.wiley.com/doi/full/10.1002/ece3.70678) that are used in this script.
-
-
 ## Diagnose models
 
-```{r, fig.width=17, fig.height=7}
+Typical model diagnostics are:\
+Effective sample size shuold be above 200. Sometimes this can be increased by increasing the iteration numbers.\
+$\hat{R}$ should be below 1.05 and preferably below 0.01. This indicates the model convergence.\
+Posterior likelihood to be well-mixed.\
+Acceptance rate well mixing and \> 0.75.\
+Tree depth should not be at the maximum treedepth.\
+No Divergence transitions should not be present during sampling phase.\
+Step size should not be wiggeling during sampling phase.\
+
+```{r, fig.width=12, fig.height=17}
 diagnose_model(M5_output)
 ```
+
+All the data used in this script are retrieved from [Guri et al., 2024](https://onlinelibrary.wiley.com/doi/full/10.1002/ece3.70678).
 
 # All functions {#All_functions}
 
