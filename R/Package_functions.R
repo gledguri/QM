@@ -1990,32 +1990,38 @@ If you wish to include those, change the \"sample_type\" asigned value to UNKNOW
 }
 
 
-extract_ini_conc <- function(model_output,value='mean'){
+extract_ini_conc <- function(model_output){
+	stan_data <- model_output[[1]]
 	stanMod <- model_output[[2]]
 
-	mat <- extract_matrix(stanMod,"alr_2",vector=value)
-	last_r <- extract_param(stanMod,"C_q") %>% pull({{ value }})
-		# pull(mean)
-	return(rbind(mat,last_r))
-}
+	mat <- extract_matrix(stanMod,"alr_2",vector='mean')
+	last_r <- extract_param(stanMod,"C_q") %>% pull(mean)
+	est_ini_conc <- rbind(mat,last_r)
 
-plot_est_ini_conc <- function(model_output, k=2){
-	stan_data <- model_output[[1]]
+	mat_lo <- extract_matrix(stanMod,"alr_2",vector='2.5%')
+	last_r_lo <- extract_param(stanMod,"C_q") %>% pull(`2.5%`)
+	est_ini_conc_lo <- rbind(mat_lo,last_r_lo)
 
-	est_ini_conc <- extract_ini_conc(model_output)
-	est_ini_conc_lo <- extract_ini_conc(model_output,value = '2.5%')
-	est_ini_conc_up <- extract_ini_conc(model_output,value = '97.5%')
+	mat_up <- extract_matrix(stanMod,"alr_2",vector='97.5%')
+	last_r_up <- extract_param(stanMod,"C_q") %>% pull(`97.5%`)
+	est_ini_conc_up <- rbind(mat_up,last_r_up)
 
 	est_ini_conc_long <- est_ini_conc %>% setNames(stan_data$label_mb_sample$Sample_name) %>%
 		rownames_to_column('sp_idx') %>% mutate(sp_idx=as.numeric(sp_idx)) %>%
-		left_join(.,bind_cols(stan_data$Species,stan_data$species_idx),
-							by='sp_idx') %>% select(Species,colnames(.),-sp_idx) %>%
+		left_join(.,stan_data$label_mb_species,by='sp_idx') %>%
+		select(Species,colnames(.),-sp_idx) %>%
 		pivot_longer(cols = -Species,
 								 names_to = 'Sample',
 								 values_to = 'Conc') %>%
 		bind_cols(.,
-							est_ini_conc_lo %>% pivot_longer(cols = everything(),values_to = 'Conc_2.5%') %>% select(-name),
-							est_ini_conc_up %>% pivot_longer(cols = everything(),values_to = 'Conc_97.5%')%>% select(-name))
+							est_ini_conc_lo %>% pivot_longer(cols = everything(),values_to = 'Conc_2.5%CI') %>% select(-name),
+							est_ini_conc_up %>% pivot_longer(cols = everything(),values_to = 'Conc_97.5%CI')%>% select(-name))
+	return(est_ini_conc_long)
+
+}
+
+plot_est_ini_conc <- function(model_output, k=2){
+	est_ini_conc_long <- extract_ini_conc(model_output)
 
 	nr <- nrow(est_ini_conc)*k
 	nudge_vector <- rep(c(1:nrow(est_ini_conc))*(1/nr)-(max(c(1:nrow(est_ini_conc))*(1/nr))/2),each=ncol(est_ini_conc))
@@ -2024,7 +2030,7 @@ plot_est_ini_conc <- function(model_output, k=2){
 		est_ini_conc_long %>% bind_cols(.,nudge_vector %>% as.data.frame() %>% setNames('nudge_vector')) %>%
 		ggplot()+
 		geom_point(aes(x=Sample,y=exp(Conc),color=Species),position = position_nudge(x = nudge_vector))+
-		geom_linerange(aes(x=Sample, ymin=exp(`Conc_2.5%`),ymax=exp(`Conc_97.5%`),color=Species),position = position_nudge(x = nudge_vector))+
+		geom_linerange(aes(x=Sample, ymin=exp(`Conc_2.5%CI`),ymax=exp(`Conc_97.5%CI`),color=Species),position = position_nudge(x = nudge_vector))+
 		scale_color_manual(values = moma.colors("Lupi", n=nrow(est_ini_conc)))+
 		scale_y_log10(labels=scientific_10)+
 		theme_bw()+
