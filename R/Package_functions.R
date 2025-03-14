@@ -2023,6 +2023,7 @@ extract_ini_conc <- function(model_output){
 plot_est_ini_conc <- function(model_output, k=2){
 	est_ini_conc_long <- extract_ini_conc(model_output)
 
+	stanMod <- model_output[[2]]
 	mat <- extract_matrix(stanMod,"alr_2",vector='mean')
 	last_r <- extract_param(stanMod,"C_q") %>% pull(mean)
 	est_ini_conc <- rbind(mat,last_r)

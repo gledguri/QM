@@ -300,11 +300,14 @@ M3 <- load_model('M3')
 
 ## Prepare the data to be loaded in the model.
 
-The data should be formatted in a particular form. Please use `data_example('M3')` to see the data format for required for Model 2 or use `data(metabarcoding)` to load the data included in the package and select the columns that belong to the mock community.
+The data should be formatted in a particular form. Please use `data_example('M3')` to see the data format for required for Model 2 or use `data(metabarcoding)` to load the data included in the package and select the columns that belong to the mock community. 
 
-alpha magnitude xxx
+Important! Please assign 'Zz\_' before the name of the reference species and assign it on the last row on the metabarcoding dataframe.
 
-reference species Zz\_
+An additional feature is the `alpha magnitude` you can indicate the prior distribution of $\alpha$ parameter. 
+
+
+
 
 ```{r}
 # Trim metabarcoding data only for mock samples
@@ -329,7 +332,6 @@ M3_output <- Run_Model(stan_object = M3, stan_data = stan_data_M3)
 ## Extract outputs
 
 These two functions extract the amplification efficiency from the [Model 3](#Model_3) (eq 3.3). Note that the values are in additive log-ratios and the reference species = 0. Each `alpha` value can be interpreted as the log-difference of amplification efficiency of the species relative to the reference species per each PCR cycle. Any negative value would be indicating poorer amplification efficiency than that of the reference species and positive values vice-versa. Let's say a value `-0.015` is indicating that the species is amplifying `-0.015` times more 'inefficient' per each PCR cycle than that of the reference species.
-
 
 ```{r}
 extract_amp_efficiecy(M3_output)
