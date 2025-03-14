@@ -2023,6 +2023,10 @@ extract_ini_conc <- function(model_output){
 plot_est_ini_conc <- function(model_output, k=2){
 	est_ini_conc_long <- extract_ini_conc(model_output)
 
+	mat <- extract_matrix(stanMod,"alr_2",vector='mean')
+	last_r <- extract_param(stanMod,"C_q") %>% pull(mean)
+	est_ini_conc <- rbind(mat,last_r)
+
 	nr <- nrow(est_ini_conc)*k
 	nudge_vector <- rep(c(1:nrow(est_ini_conc))*(1/nr)-(max(c(1:nrow(est_ini_conc))*(1/nr))/2),each=ncol(est_ini_conc))
 

@@ -130,6 +130,8 @@ In short the presence (Z = 1) or absence (Z = 0) of qPCR amplification in sample
 Additionally the second compartment models the observed Ct values (Y) in sample $i$ in technical replicate $j$ as random variable drawn from a Normal distribution with mean $\mu$ and standard deviation $\sigma$. We model $\mu$ as a linear function of DNA concentration (C) with intercept and slope $\beta0$ and $\beta1$ (Equation 2.2). The standard deviation of the observed Y is an exponential function of DNA concentration with intercept and slope $\gamma0$ and $\gamma1$ (Equation 2.3). Note that $\beta0$ (intercept between Ct and DNA concentration) has subscript $_p$ meaning that is different for every plate. The reason for having a different $\beta0$ is due to the qPCR machine being sensitive to external factors hence every qPCR run has a different $\Delta$Rn (normalized fluorescence signal).
 
 $$
+
+\Large
 \begin{aligned}
 &\textbf{qPCR probability of detection model}\\
 Z_{ij} &\sim \text{Bernoulli}(\theta_{i}) && \text{(1.1)} \\
@@ -143,7 +145,6 @@ Y_{ij} &\sim \text{Normal}(\mu_{i}, \sigma_{i}) && \text{(2.1)} \\
 $$
 
 ## Load the stan model
-
 
 ```{r, warning=FALSE, message=FALSE,results='hide'}
 M1 <- load_model('M1')
@@ -212,7 +213,6 @@ M2 <- load_model('M2')
 
 The data should be formatted in a particular form. Please use `data_example('M2')` to see the data format for required for Model 2 or use `data(cod_qpcr)` to load the data included in the package.
 
-
 ```{r}
 stan_data_M2 <- prep_stan_M2(
 	qpcr_data = cod_qpcr,
@@ -221,8 +221,11 @@ stan_data_M2 <- prep_stan_M2(
 	sample_name_column = "Sample_name",
 	standard_concentration = "Std_concentration",
 	plate_index = 'Plate')
+```
 
-# Run the model
+## Run the model.
+
+```{r}
 M2_output <- Run_Model(stan_object = M2, stan_data = stan_data_M2)
 ```
 
@@ -260,28 +263,34 @@ Here I provide a standard way of plotting the estimated DNA concentration of env
 plot_est_conc(M2_output)
 ```
 
-
 # Model 3 {#Model_3}
-Here we establish that the number of observed reads (R) from metabarcoding is a draw from a multinomial distribution given the proportions for each species $\psi$ and the total number of reads per sample T (eq 3.1). We formulate that $\psi$ is the softmax transformation of $\gamma$ the post-PCR log-ratio amplicon abundance. 
 
-which produces proportions for each taxon (μi) from the log-ratios of abundance
-Equations 4.2.1 and 4.2.2 link proportions ψ for each species i to observations, via a softmax transformation of the ratios of species abundances γ.
+Here we establish that the number of observed reads (R) of each species $s$ in sample $i$ from metabarcoding sequencing is a draw from a Multinomial distribution given the proportions for each species $\psi$ in each sample and the total number of reads (T) per that sample (eq 3.1). We formulate that $\psi$ is the softmax transformation of $\gamma$ the post-PCR log-ratio amplicon abundance (eq 3.2). The post-PCR log-ratio amplicon abundance $\gamma$, is the known (pre-PCR) log-ratio DNA concentration ($alr$) modified by the product of the ratio of amplification efficiencies $\alpha$ for each taxa and the number of PCR cycles ($NPCR$) (eq 3.3).
 
-The known initial concentrations of all species i from mock community samples is converted into additive log ratios (alri) relative to a reference species of choice (G. morhua in this study, see Shelton et al. 2023), using the following equation:
-
-where NPCR is the number of PCR cycles used to amplify the amplicons, α is the species-specific amplification efficiency (again, expressed as a log-ratio relative to that of a reference species; see Shelton et al. 2023), and η is the parameter that allows for overdispersion in the counts beyond the variability provided by the multinomial distribution, capturing the substantial variance among replicates often observed in metabarcoding data.
-
-Having estimated the species-specific amplification efficiencies in Equation 4.3.1, we can derive the absolute DNA quantities for each species, station, and year (Cijy), given the known concentration of the reference species (Ci=ref, G. morhua) estimated in Equation 3.2.2 for the same samples.
-
-$$\Large
+$$
+\Large
 \begin{align*} 
-R_{im}\ &\sim \text {Multinomial} \left(\psi_{im},\ T_m\right) && \text{(3.1)}\\ 
-{\vec{\psi}}_{im}&=\frac{e^{{\vec{\gamma}}_{im}}}{\sum_{i=1}^{I}e^{\gamma_{im}}} && \text{(3.2)}\\ 
-\gamma_{im}&={alr}_i+\left(NPCR\times\alpha_i\right) && \text{(3.3)}\\ 
- \end{align*}
+R_{is}\ &\sim \text {Multinomial} \left(\psi_{is},\ T_i\right) && \text{(3.1)}\\ 
+{\psi}_{is}&=\frac{e^{{\gamma}_{is}}}{\sum_{i=1}^{I}e^{\gamma_{is}}} && \text{(3.2)} \\
+\gamma_{is}&=alr_{is}+\left(NPCR\times\alpha_s\right) && \text{(3.3)} \\
+\end{align*}
 $$
 
+I know that log-ratio hurts people's brain so here's a development of the equation 3.3 to put into perspective.
 
+$$ 
+\Large \begin{align*} 
+{\gamma}_{is}&= alr_{is} + NPCR \cdot \alpha \\ 
+ln\left(\frac{\pi_{is}}{\pi_{i,s=\text{ref}}}\right)&= ln\left(\frac{C_{is}}{C_{i,s=\text{ref}}}\right) + NPCR \cdot 
+ln\left(\frac{1 + a_s}{1 + a_{s=\text{ref}}} \right)\\ 
+\underbrace{\frac{\pi_{is}}{\pi_{i,s=\text{ref}}}}_{\text{Post-PCR ratio}} &=
+\underbrace{\frac{C_{is}}{C_{i,s=\text{ref}}}}_{\text{Pre-PCR ratio}} \cdot \underbrace{\left( \frac{1 + a_s}{1 + a_{s=\text{ref}}} \right)^{NPCR}}_{\text{PCR amplification factor}}
+\end{align*} 
+$$
+
+where $\pi / \pi_{\text{ref}}$ is the ratio of post-PCR sequence abundance relative to the reference species, $C /C_{\text{ref}}$ is the ratio of pre-PCR sequence abundance relative to the reference species, and $a / a_{\text{ref}}$ is the amplification efficiency relative to the reference species. With so many ratios it is easier to make mistakes, therefore we use their log-ratios (also computationally easier) and annotate these log-ratios with $\gamma$, $alr$, and $\alpha$ respectively, keeping in mind that such ratios are always relative to the reference species.
+
+Since we know the pre-PCR (initial) concentration when using a mock community and we can derive the post-PCR proportions using the model (eq 3.1 - 3.3) we can estimate the amplification efficiency for each species (always) relative to a reference species.
 
 ## Load the stan model
 
@@ -290,6 +299,12 @@ M3 <- load_model('M3')
 ```
 
 ## Prepare the data to be loaded in the model.
+
+The data should be formatted in a particular form. Please use `data_example('M3')` to see the data format for required for Model 2 or use `data(metabarcoding)` to load the data included in the package and select the columns that belong to the mock community.
+
+alpha magnitude xxx
+
+reference species Zz\_
 
 ```{r}
 # Trim metabarcoding data only for mock samples
@@ -304,12 +319,17 @@ stan_data_M3 <- prep_stan_M3(
 	species_names = 'Species',
 	number_of_PCR = 43,
 	alpha_magnitude = 0.1)
+```
 
-# Run the model
+## Run the model.
+```{r}
 M3_output <- Run_Model(stan_object = M3, stan_data = stan_data_M3)
 ```
 
 ## Extract outputs
+
+These two functions extract the amplification efficiency from the [Model 3](#Model_3) (eq 3.3). Note that the values are in additive log-ratios and the reference species = 0. Each `alpha` value can be interpreted as the log-difference of amplification efficiency of the species relative to the reference species per each PCR cycle. Any negative value would be indicating poorer amplification efficiency than that of the reference species and positive values vice-versa. Let's say a value `-0.015` is indicating that the species is amplifying `-0.015` times more 'inefficient' per each PCR cycle than that of the reference species.
+
 
 ```{r}
 extract_amp_efficiecy(M3_output)
