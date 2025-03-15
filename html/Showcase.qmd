@@ -65,9 +65,9 @@ options(width = 300) #wd
 options(width = dwidth)#wd
 ```
 
-Please cite:
-Guri et al., [(2024)](https://onlinelibrary.wiley.com/doi/full/10.1002/ece3.70678) Quantifying the Detection Sensitivity and Precision of qPCR and ddPCR Mechanisms for eDNA Samples) for Models 1-2.
-Guri et al., [(2024)](https://academic.oup.com/icesjms/article/81/8/1536/7728836) (Predicting trawl catches using environmental DNA) for models 3-5.
+Please cite:\
+Guri et al., [(2024)](https://onlinelibrary.wiley.com/doi/full/10.1002/ece3.70678) Quantifying the Detection Sensitivity and Precision of qPCR and ddPCR Mechanisms for eDNA Samples) for Models 1-2.\
+Guri et al., [(2024)](https://academic.oup.com/icesjms/article/81/8/1536/7728836) (Predicting trawl catches using environmental DNA) for models 3-5.\
 
 This package is designed to simplify complex mathematical processes, allowing researchers, resource managers, and technicians to analyze environmental DNA (eDNA) data without needing advanced mathematical expertise. By using Bayesian inference, the package helps estsimate eDNA concentration from field samples. This package is currently in beta development, and new features and improved documentation are ongoing. Please feel free to reach out with any questions or feedback.
 
@@ -515,7 +515,7 @@ Step size should not be wiggeling during sampling phase.\
 diagnose_model(M5_output)
 ```
 
-All the data used in this script are retrieved from [Guri et al., 2024](https://onlinelibrary.wiley.com/doi/full/10.1002/ece3.70678).
+All the data used in this script are retrieved from [Guri et al., 2024](https://academic.oup.com/icesjms/article/81/8/1536/7728836).
 
 # All functions {#All_functions}
 
